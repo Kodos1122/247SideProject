@@ -1,0 +1,208 @@
+.sidebar-link {
+    display: block;
+    width: 100%;
+    padding: 0.2rem;
+    background-color: transparent;
+    color: white;
+    transition: background-color 0.3s ease;
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar-link:hover {
+    background-color: #fbfcfd1a;
+    background-color: solid transparent;
+}
+
+
+
+.toggle-button {
+    padding: 5px 8px 4px 8px;
+    background-color: #f1f1f1;
+    border-radius: 9999px;
+    border: 3px solid #bfdbfe;
+    transition: background-color 0.2s ease;
+}
+
+.toggle-button:hover {
+    background-color: #1e3a8a;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6b7280;
+}
+
+.dashboard-container {
+    background-color: var(--surface-50);
+    color: var(--text-surface-900);
+    padding: 2rem;
+}
+
+.grid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.info-card {
+    background-color: var(--surface-0);
+    color: var(--text-surface-900);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.info-card:hover {
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.info-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-surface-500);
+    margin-bottom: 0.5rem;
+}
+
+.info-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 8px;
+}
+
+.icon-color-blue {
+    color: var(--blue-500);
+}
+
+.icon-color-orange {
+    color: var(--orange-500);
+}
+
+.icon-color-cyan {
+    color: var(--cyan-500);
+}
+
+.icon-color-purple {
+    color: var(--purple-500);
+}
+
+.breadcrumb-container {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    color: #6b7280;
+}
+
+.home-icon {
+    color: #6b7280;
+    margin-left: 20px;
+    font-size: 14px;
+}
+
+.breadcrumb-item {
+    font-weight: 500;
+}
+
+.breadcrumb-separator {
+    margin: 0 8px;
+    font-size: 12px;
+}
+
+.main-content {
+    padding: 13px;
+    background-color: #f4f4f4;
+}
+
+.new-button {
+    background-color: #14377d;
+    color: #fff;
+    font-weight: bold;
+}
+
+.custom-dialog {
+    background-color: #ffffff; /* White background for dialog */
+    border-radius: 10px;
+    padding: 11px;
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15); /* Deeper shadow for modal */
+}
+
+.custom-dialog .p-dialog-header {
+    font-weight: bold;
+    color: #2f3e4d; /* Darker gray for header text */
+    font-size: 1.25rem;
+}
+
+.form-field .p-float-label label {
+    color: #5a6b7b; /* Softer gray for labels */
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+.form-field .p-inputtext {
+    width: 100%;
+    padding: 0.7rem;
+    border: 1px solid #d1d9e0; /* Light gray border */
+    border-radius: 8px;
+    background-color: #f9fafb; /* Very light gray for input background */
+    transition:
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
+}
+.form-field .p-inputtext:focus {
+    border-color: #0056b3; /* Blue border on focus */
+    box-shadow: 0px 0px 6px rgba(0, 86, 179, 0.3);
+}
+
+.p-button-outlined {
+    color: #6c757d; /* Medium gray for outlined button */
+    border-color: #6c757d;
+    padding: 0.5rem 0.5rem;
+    font-weight: 600;
+    border-radius: 6px;
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+.p-button-outlined:hover {
+    background-color: #f1f3f5; /* Light gray on hover */
+    color: #4a4a4a;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.p-button-success {
+    background-color: #14377d; /* Deep blue for Save button */
+    border: none;
+    color: #ffffff;
+    padding: 0rem 1rem;
+    font-weight: 600;
+    border-radius: 6px;
+    transition:
+        background-color 0.3s ease,
+        box-shadow 0.3s ease;
+}
+.p-button-success:hover {
+    background-color: #0d285b; /* Darker blue on hover */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.p-dialog .p-dialog-content {
+    color: #495057; /* Soft gray for dialog text */
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.p-dialog-footer {
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef; /* Light border on footer */
+}
