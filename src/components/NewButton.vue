@@ -1,4 +1,3 @@
-<!-- NewButton.vue -->
 <template>
     <Button :label="label" class="new-button" @click="onClick">{{
         label
@@ -8,7 +7,6 @@
 <script setup>
 import Button from 'primevue/button';
 
-// Props for customization
 const props = defineProps({
     label: {
         type: String,
@@ -18,7 +16,6 @@ const props = defineProps({
 
 const emit = defineEmits(['click']);
 
-// Emit click event when button is clicked
 function onClick() {
     try {
         emit('click');
@@ -29,7 +26,6 @@ function onClick() {
 </script>
 
 <style scoped>
-/* Add an icon in front of the text */
 .new-button::before {
     content: '+';
     margin-right: 7px;

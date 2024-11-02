@@ -52,7 +52,6 @@ import { getCodeSets, deleteCodeSet } from '../stores/localStorageData';
 const localSearch = ref('');
 const services = ref([]);
 
-// Load services data initially and set up refresh listener
 function loadData() {
     services.value = getCodeSets() || [];
 }
@@ -66,20 +65,16 @@ onBeforeUnmount(() => {
     document.removeEventListener('refreshCodeSets', loadData);
 });
 
-// Computed property to filter services based on search input
 const filteredServices = computed(() => {
     return services.value.filter((service) =>
         service?.name?.toLowerCase().includes(localSearch.value.toLowerCase())
     );
 });
 
-// Function to delete a service item
 function deleteItem(item) {
     deleteCodeSet(item.id);
-    loadData(); // Refresh data after deletion
+    loadData();
 }
 </script>
 
-<style scoped>
-/* Add any styles if necessary */
-</style>
+<style scoped></style>

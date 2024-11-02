@@ -128,7 +128,7 @@ main {
     color: #6c757d;
     font-weight: bold;
     font-size: 14px;
-    transition: border-color 0.2s ease; /* Smooth transition for hover */
+    transition: border-color 0.2s ease; 
 }
 
 .tab-button:hover:not(.active-tab),

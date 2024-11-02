@@ -1,4 +1,3 @@
-<!-- Navbar.vue -->
 <template>
     <nav class="flex items-center justify-between bg-white-900">
         <div class="text-[27px] font-medium">
@@ -19,9 +18,9 @@ const mainTab = computed(() => mainStore.mainTab);
 const emit = defineEmits(['add-new-data']);
 
 function handleAddNew() {
-    console.log('handleAddNew triggered'); // Debugging log
-    console.log('subTab:', mainStore.subTab); // Verify subTab value
-    emit('add-new-data', mainStore.subTab); // Emit the event with subTab
+    console.log('handleAddNew triggered');
+    console.log('subTab:', mainStore.subTab);
+    emit('add-new-data', mainStore.subTab);
 }
 </script>
 

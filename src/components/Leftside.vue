@@ -76,17 +76,15 @@ import Codegroups from '../modules/Codegroups.vue';
 
 const mainStore = useMainStore();
 
-const activeComponent = ref('Codesets'); // Adjust based on active route // Adjust based on active route
+const activeComponent = ref('Codesets');
 
 const handleAddNewData = () => {
     if (activeComponent.value === 'Codesets') {
-        // Show dialog in Codesets component
         const codesetsTable = ref.codesetsTable;
         if (codesetsTable && codesetsTable.showDialog) {
             codesetsTable.showDialog('Add');
         }
     } else if (activeComponent.value === 'Codegroups') {
-        // Show dialog in Codegroups component
         const codegroupsTable = ref.codegroupsTable;
         if (codegroupsTable && codegroupsTable.showDialog) {
             codegroupsTable.showDialog('Add');

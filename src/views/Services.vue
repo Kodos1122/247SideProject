@@ -62,40 +62,34 @@ import {
 } from '../stores/localStorageData';
 
 const mainStore = useMainStore();
-const currentSubTab = ref('Code Sets'); // Default to Code Sets tab
+const currentSubTab = ref('Code Sets');
 const dialogVisible = ref(false);
 const dialogAction = ref('Add');
 const currentItem = ref({});
 
-// Set initial values in the store
 mainStore.setMainTab('Services');
 mainStore.setSubTab(currentSubTab.value);
 
-// Watch the `currentSubTab` ref and update the store whenever it changes
 watch(currentSubTab, (newTab) => {
     mainStore.setSubTab(newTab);
 });
 
-// Handle tab selection
 function selectSubTab(subTabName) {
     currentSubTab.value = subTabName;
 }
 
-// Handle adding new data
 function handleAddNewData() {
     dialogAction.value = 'Add';
-    currentItem.value = {}; // Reset the item
+    currentItem.value = {};
     dialogVisible.value = true;
 }
 
-// Handle editing existing data
 function editItem(item) {
     dialogAction.value = 'Edit';
     currentItem.value = { ...item };
     dialogVisible.value = true;
 }
 
-// Save item after editing or adding and emit a refresh event
 function saveItem(item) {
     if (currentSubTab.value === 'Code Sets') {
         if (dialogAction.value === 'Add') {
@@ -111,10 +105,9 @@ function saveItem(item) {
         }
     }
     dialogVisible.value = false;
-    refreshData(); // Trigger data refresh after save
+    refreshData();
 }
 
-// Emit refresh event
 function refreshData() {
     if (currentSubTab.value === 'Code Sets') {
         document.dispatchEvent(new CustomEvent('refreshCodeSets'));

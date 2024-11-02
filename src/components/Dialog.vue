@@ -1,4 +1,3 @@
-<!-- Dialog.vue -->
 <template>
     <Dialog
         v-model:visible="isVisible"
@@ -86,7 +85,6 @@ const props = defineProps({
 
 const emit = defineEmits(['update:visible', 'save']);
 
-// Computed property to bind with visible state
 const isVisible = computed({
     get: () => props.visible,
     set: (value) => emit('update:visible', value)
@@ -103,7 +101,6 @@ function save() {
     emit('save', currentItem.value);
 }
 
-// Watch for changes to itemData prop and reset currentItem
 watch(
     () => props.itemData,
     (newData) => {

@@ -28,11 +28,8 @@ const props = defineProps({
 });
 
 const mainStore = useMainStore();
-
-// Check if this tab is the active one
 const isActive = computed(() => mainStore.mainTab === props.label);
 
-// Set the active tab in the store when clicked
 const setActiveTab = () => {
     mainStore.setMainTab(props.label);
 };
