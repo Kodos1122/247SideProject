@@ -122,26 +122,25 @@ main {
 .tab-button {
     padding: 10px 20px;
     cursor: pointer;
-    background-color: transparent;
+    background: none;
     border: none;
-    border-bottom: 2px solid transparent;
+    border-bottom: 1px solid transparent;
     color: #6c757d;
     font-weight: bold;
-    font-size: 14px
+    font-size: 14px;
+    transition: border-color 0.2s ease; /* Smooth transition for hover */
 }
 
-.tab-button:hover {
-    border-bottom: 2px solid #c7c8ca;
+.tab-button:hover:not(.active-tab),
+.tab-button:focus:not(.active-tab) {
+    border-bottom-color: #6b6c6d;
 }
 
 .active-tab {
     color: #14377D;
-    border-bottom: 2px solid #14377D;
+    border-bottom: 1.5px solid #14377D;
 }
 
-.active-tab:focus {
-    border-bottom: 2px solid #14377D;
-}
 
 .search-bar {
     display: flex;
@@ -152,12 +151,14 @@ main {
 
 
 .search-bar i {
+margin-top: 20px;
 position: absolute;
 padding: 8px 9px;
 color: #a4a3a3
 }
 
 .search-input {
+    margin-top: 20px;
     width: 260px;
     padding: 4px 30px;
     border: 1px solid black;
@@ -232,9 +233,9 @@ color: #a4a3a3
     background-color: #14377D;
     color: white;
     border: none;
-    padding: 6px 16px;
+    padding: 1px 16px;
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 15px;
     display: flex;
     align-items: center;
     cursor: pointer;

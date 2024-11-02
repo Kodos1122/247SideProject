@@ -1,97 +1,28 @@
+<!-- Navbar.vue -->
 <template>
-    <div class="main-content">
-        <nav class="flex items-center justify-between bg-white-900">
-            <div class="text-2xl text-black font-semibold">
-                <span>{{ mainTab }}</span>
-            </div>
-
-            <Button class="new-button" @click="showDialog">
-                <i text="New" class="pi pi-plus"></i> New
-            </Button>
-        </nav>
-
-        <Dialog
-            v-model:visible="visible"
-            modal
-            header="Add New Code Sets"
-            :style="{ width: '30rem' }"
-            :class="['custom-dialog']"
-        >
-            <span class="text-gray-500 block mb-5"
-                >Fill in the details below.</span
-            >
-
-            <div class="form-field mb-7">
-                <FloatLabel>
-                    <InputText v-model="name" id="Name" />
-                    <label for="Name">Name</label>
-                </FloatLabel>
-            </div>
-            <div class="form-field mb-7">
-                <FloatLabel>
-                    <InputText v-model="effectiveDate" id="EffectiveDate" />
-                    <label for="EffectiveDate">Effective Date</label>
-                </FloatLabel>
-            </div>
-            <div class="form-field mb-7">
-                <FloatLabel>
-                    <InputText v-model="lastUpdated" id="LastUpdated" />
-                    <label for="LastUpdated">Last Updated</label>
-                </FloatLabel>
-            </div>
-            <div class="form-field mb-4">
-                <FloatLabel>
-                    <InputText v-model="status" id="Status" />
-                    <label for="Status">Status</label>
-                </FloatLabel>
-            </div>
-
-            <div class="flex justify-end gap-3 mt-6">
-                <Button
-                    label="Cancel"
-                    class="p-button-outlined"
-                    @click="hideDialog"
-                />
-                <Button
-                    label="Save"
-                    class="p-button-success"
-                    @click="saveData"
-                />
-            </div>
-        </Dialog>
-    </div>
+    <nav class="flex items-center justify-between bg-white-900">
+        <div class="text-[27px] font-medium">
+            <span>{{ mainTab }}</span>
+        </div>
+        <NewButton @click="handleAddNew" />
+    </nav>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import { useMainStore } from '../stores/useStore';
-import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
-import InputText from 'primevue/inputtext';
-import FloatLabel from 'primevue/floatlabel';
+import NewButton from './NewButton.vue';
 
 const mainStore = useMainStore();
 const mainTab = computed(() => mainStore.mainTab);
-const visible = ref(false);
 
-const name = ref('');
-const effectiveDate = ref('');
-const lastUpdated = ref('');
-const status = ref('');
+const emit = defineEmits(['add-new-data']);
 
-const showDialog = () => {
-    visible.value = true;
-};
-const hideDialog = () => {
-    visible.value = false;
-};
-
-const saveData = () => {
-    console.log(
-        `Name: ${name.value}, Effective Date: ${effectiveDate.value}, Last Updated: ${lastUpdated.value}, Status: ${status.value}`
-    );
-    hideDialog();
-};
+function handleAddNew() {
+    console.log('handleAddNew triggered'); // Debugging log
+    console.log('subTab:', mainStore.subTab); // Verify subTab value
+    emit('add-new-data', mainStore.subTab); // Emit the event with subTab
+}
 </script>
 
 <style scoped></style>

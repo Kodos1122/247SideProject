@@ -1,5 +1,7 @@
 <template>
     <div class="main-content">
+        <Navbar class="nav" @add-new-data="handleAddNewData" />
+
         <div class="tabs-container">
             <button
                 :class="[
@@ -22,158 +24,108 @@
         </div>
 
         <div class="bg-white shadow-md rounded mt-4">
-            <div class="search-bar">
-                <input
-                    v-model="search"
-                    class="search-input"
-                    type="text"
-                    placeholder="Search"
-                />
-                <i class="pi pi-search"></i>
-            </div>
-
-            <DataTable
+            <CodeSets
                 v-if="currentSubTab === 'Code Sets'"
-                :value="filteredServices"
-                class="table-container"
-                responsiveLayout="scroll"
-            >
-                <Column field="name" header="Name" sortable></Column>
-                <Column
-                    field="effectiveDate"
-                    header="Effective Date"
-                    sortable
-                ></Column>
-                <Column
-                    field="lastUpdated"
-                    header="Last Updated"
-                    sortable
-                ></Column>
-                <Column field="status" header="Status" sortable></Column>
-                <Column header="Actions">
-                    <template #body="slotProps">
-                        <button
-                            @click="editItem(slotProps.data)"
-                            class="action-button edit-button"
-                        >
-                            Edit
-                        </button>
-                        <button
-                            @click="deleteItem(slotProps.data)"
-                            class="action-button delete-button"
-                        >
-                            Delete
-                        </button>
-                    </template>
-                </Column>
-            </DataTable>
-
-            <DataTable
+                @edit-item="editItem"
+                @refresh-data="refreshData"
+            />
+            <CodeGroups
                 v-if="currentSubTab === 'Code Groups'"
-                :value="filteredGroups"
-                class="table-container"
-                responsiveLayout="scroll"
-            >
-                <Column field="name" header="Group Name" sortable></Column>
-                <Column
-                    field="description"
-                    header="Description"
-                    sortable
-                ></Column>
-                <Column
-                    field="createdDate"
-                    header="Created Date"
-                    sortable
-                ></Column>
-                <Column field="status" header="Status" sortable></Column>
-                <Column header="Actions">
-                    <template #body="slotProps">
-                        <button
-                            @click="editItem(slotProps.data)"
-                            class="action-button edit-button"
-                        >
-                            Edit
-                        </button>
-                        <button
-                            @click="deleteItem(slotProps.data)"
-                            class="action-button delete-button"
-                        >
-                            Delete
-                        </button>
-                    </template>
-                </Column>
-            </DataTable>
+                @edit-item="editItem"
+                @refresh-data="refreshData"
+            />
         </div>
+
+        <Dialog
+            :visible="dialogVisible"
+            :itemType="currentSubTab"
+            :actionType="dialogAction"
+            :itemData="currentItem"
+            @update:visible="dialogVisible = $event"
+            @save="saveItem"
+        />
     </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, watch } from 'vue';
+import Navbar from '../components/Navbar.vue';
+import CodeSets from '../modules/Codesets.vue';
+import CodeGroups from '../modules/Codegroups.vue';
+import Dialog from '../components/Dialog.vue';
 import { useMainStore } from '../stores/useStore';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
+import {
+    addCodeSet,
+    updateCodeSet,
+    addCodeGroup,
+    updateCodeGroup
+} from '../stores/localStorageData';
 
 const mainStore = useMainStore();
+const currentSubTab = ref('Code Sets'); // Default to Code Sets tab
+const dialogVisible = ref(false);
+const dialogAction = ref('Add');
+const currentItem = ref({});
 
-const search = ref('');
-const services = ref([
-    {
-        id: 1,
-        name: 'Health Service',
-        effectiveDate: '2023-10-01',
-        lastUpdated: '2023-10-15',
-        status: 'Active'
-    },
-    {
-        id: 2,
-        name: 'Life Insurance',
-        effectiveDate: '2023-09-01',
-        lastUpdated: '2023-09-20',
-        status: 'Inactive'
-    }
-]);
-const groups = ref([
-    {
-        id: 1,
-        name: 'Admin Group',
-        description: 'Group for Admins',
-        createdDate: '2023-05-01',
-        status: 'Active'
-    },
-    {
-        id: 2,
-        name: 'User Group',
-        description: 'Group for Users',
-        createdDate: '2023-06-15',
-        status: 'Inactive'
-    }
-]);
-
-const currentSubTab = computed(() => mainStore.subTab);
-
-const filteredServices = computed(() =>
-    services.value.filter((service) =>
-        service.name.toLowerCase().includes(search.value.toLowerCase())
-    )
-);
-const filteredGroups = computed(() =>
-    groups.value.filter((group) =>
-        group.name.toLowerCase().includes(search.value.toLowerCase())
-    )
-);
-
-function selectSubTab(subTabName) {
-    mainStore.setSubTab(subTabName);
-}
-function editItem(item) {
-    console.log('Edit', item);
-}
-function deleteItem(item) {
-    console.log('Delete', item);
-}
-
+// Set initial values in the store
 mainStore.setMainTab('Services');
-selectSubTab('Code Sets');
+mainStore.setSubTab(currentSubTab.value);
+
+// Watch the `currentSubTab` ref and update the store whenever it changes
+watch(currentSubTab, (newTab) => {
+    mainStore.setSubTab(newTab);
+});
+
+// Handle tab selection
+function selectSubTab(subTabName) {
+    currentSubTab.value = subTabName;
+}
+
+// Handle adding new data
+function handleAddNewData() {
+    dialogAction.value = 'Add';
+    currentItem.value = {}; // Reset the item
+    dialogVisible.value = true;
+}
+
+// Handle editing existing data
+function editItem(item) {
+    dialogAction.value = 'Edit';
+    currentItem.value = { ...item };
+    dialogVisible.value = true;
+}
+
+// Save item after editing or adding and emit a refresh event
+function saveItem(item) {
+    if (currentSubTab.value === 'Code Sets') {
+        if (dialogAction.value === 'Add') {
+            addCodeSet(item);
+        } else {
+            updateCodeSet(item);
+        }
+    } else if (currentSubTab.value === 'Code Groups') {
+        if (dialogAction.value === 'Add') {
+            addCodeGroup(item);
+        } else {
+            updateCodeGroup(item);
+        }
+    }
+    dialogVisible.value = false;
+    refreshData(); // Trigger data refresh after save
+}
+
+// Emit refresh event
+function refreshData() {
+    if (currentSubTab.value === 'Code Sets') {
+        document.dispatchEvent(new CustomEvent('refreshCodeSets'));
+    } else if (currentSubTab.value === 'Code Groups') {
+        document.dispatchEvent(new CustomEvent('refreshCodeGroups'));
+    }
+}
 </script>
 
-<style scoped></style>
+<style scoped>
+.nav {
+    margin-bottom: 20px;
+}
+</style>

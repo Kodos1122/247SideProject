@@ -1,8 +1,7 @@
 <template>
     <nav aria-label="breadcrumb" class="breadcrumb-container">
         <i class="pi pi-home home-icon"></i>
-        <i class="pi pi-chevron-right breadcrumb-separator" />
-        <i v-if="mainStore.mainTab === 'Services' && mainStore.subTab"></i>
+        <i class="pi pi-chevron-right breadcrumb-separator"></i>
 
         <span v-if="mainStore.mainTab" class="breadcrumb-item">
             {{ mainStore.mainTab }}
@@ -12,6 +11,7 @@
             v-if="mainStore.mainTab === 'Services' && mainStore.subTab"
             class="pi pi-chevron-right breadcrumb-separator"
         ></i>
+
         <span
             v-if="mainStore.mainTab === 'Services' && mainStore.subTab"
             class="breadcrumb-item"
