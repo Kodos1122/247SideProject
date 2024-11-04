@@ -15,14 +15,16 @@
                 <label for="codeSetsName">Name</label>
             </div>
             <div class="form-field mb-7 p-float-label font-bold">
-                <InputText
+                <Calendar
+                    dateFormat="yy/mm/dd"
                     v-model="currentItem.effectiveDate"
                     id="codeSetsEffectiveDate"
                 />
                 <label for="codeSetsEffectiveDate">Effective Date</label>
             </div>
             <div class="form-field mb-7 p-float-label font-bold">
-                <InputText
+                <Calendar
+                    dateFormat="yy/mm/dd"
                     v-model="currentItem.lastUpdated"
                     id="codeSetsLastUpdated"
                 />
@@ -40,14 +42,16 @@
                 <label for="codeGroupsName">Name</label>
             </div>
             <div class="form-field mb-7 p-float-label font-bold">
-                <InputText
+                <Calendar
+                    dateFormat="yy/mm/dd"
                     v-model="currentItem.effectiveDate"
                     id="codeGroupsEffectiveDate"
                 />
                 <label for="codeGroupsEffectiveDate">Effective Date</label>
             </div>
             <div class="form-field mb-7 p-float-label font-bold">
-                <InputText
+                <Calendar
+                    dateFormat="yy/mm/dd"
                     v-model="currentItem.lastUpdated"
                     id="codeGroupsLastUpdated"
                 />
@@ -65,8 +69,22 @@
                 class="p-button-outlined"
                 @click="hideDialog"
             />
-            <Button label="Save" class="p-button-success" @click="save" />
+            <Button
+                label="Save"
+                class="p-button-success"
+                @click="confirmSave"
+            />
         </div>
+
+        <ConfirmDialogComponent
+            ref="confirmDialog"
+            @confirm="handleConfirmSave"
+            @cancel="handleCancelSave"
+            message="Are you sure you want to save this information?"
+            header="Save Confirmation"
+        />
+
+        <Toast position="top-right" />
     </Dialog>
 </template>
 
@@ -75,6 +93,14 @@ import { ref, computed, watch } from 'vue';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
+import Calendar from 'primevue/calendar';
+import ConfirmDialogComponent from './ConfirmDialog.vue';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
+
+const toast = useToast();
+const confirmDialog = ref(null);
+const isConfirmDialogVisible = ref(false);
 
 const props = defineProps({
     visible: Boolean,
@@ -97,8 +123,34 @@ function hideDialog() {
     emit('update:visible', false);
 }
 
+function confirmSave() {
+    if (!isConfirmDialogVisible.value) {
+        isConfirmDialogVisible.value = true;
+        confirmDialog.value.openConfirmDialog();
+    }
+}
+
+function handleConfirmSave() {
+    save();
+    showSuccessMessage();
+    isConfirmDialogVisible.value = false;
+}
+
+function handleCancelSave() {
+    isConfirmDialogVisible.value = false;
+}
+
 function save() {
     emit('save', currentItem.value);
+}
+
+function showSuccessMessage() {
+    toast.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Your information has been saved',
+        life: 3000
+    });
 }
 
 watch(

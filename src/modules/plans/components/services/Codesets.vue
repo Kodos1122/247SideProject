@@ -32,13 +32,23 @@
                         Edit
                     </button>
                     <button
-                        @click="deleteItem(slotProps.data)"
+                        @click="confirmDelete(slotProps.data)"
                         class="action-button delete-button"
                     >
                         Delete
                     </button>
                 </template>
             </Column>
+
+            <ConfirmDialogComponent
+                ref="confirmDialog"
+                @confirm="handleDelete"
+                @cancel="cancelDelete"
+                message="Are you sure you want to delete this code set?"
+                header="Delete Confirmation"
+            />
+
+            <Toast position="top-right" />
         </DataTable>
     </div>
 </template>
@@ -47,10 +57,19 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import { getCodeSets, deleteCodeSet } from '../stores/localStorageData';
+import ConfirmDialogComponent from './dialogs/ConfirmDialog.vue';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
+import {
+    getCodeSets,
+    deleteCodeSet
+} from '../../../../stores/localStorageData.js';
 
 const localSearch = ref('');
 const services = ref([]);
+const toast = useToast();
+const confirmDialog = ref(null);
+const itemToDelete = ref(null);
 
 function loadData() {
     services.value = getCodeSets() || [];
@@ -71,9 +90,28 @@ const filteredServices = computed(() => {
     );
 });
 
-function deleteItem(item) {
-    deleteCodeSet(item.id);
+function confirmDelete(item) {
+    itemToDelete.value = item;
+    confirmDialog.value.openConfirmDialog();
+}
+
+function handleDelete() {
+    deleteCodeSet(itemToDelete.value.id);
     loadData();
+    showSuccessMessage();
+}
+
+function cancelDelete() {
+    itemToDelete.value = null;
+}
+
+function showSuccessMessage() {
+    toast.add({
+        severity: 'success',
+        summary: 'Deleted',
+        detail: 'Code set has been deleted successfully.',
+        life: 2000
+    });
 }
 </script>
 

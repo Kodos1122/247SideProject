@@ -2,7 +2,6 @@ const CODE_SETS_KEY = 'codeSetsData';
 const CODE_GROUPS_KEY = 'codeGroupsData';
 
 const initialCodeSetsData = [];
-
 const initialCodeGroupsData = [];
 
 function initializeLocalStorage() {
@@ -20,6 +19,15 @@ function initializeLocalStorage() {
     }
 }
 
+// Format date to 'YYYY-MM-DD'
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 export function getData(key) {
     const data = localStorage.getItem(key);
     return data ? JSON.parse(data) : [];
@@ -30,7 +38,12 @@ function saveData(key, data) {
 }
 
 export function getCodeSets() {
-    return getData(CODE_SETS_KEY);
+    const codeSets = getData(CODE_SETS_KEY);
+    return codeSets.map((item) => ({
+        ...item,
+        effectiveDate: formatDate(item.effectiveDate),
+        lastUpdated: formatDate(item.lastUpdated)
+    }));
 }
 
 export function addCodeSet(newItem) {
@@ -53,7 +66,12 @@ export function deleteCodeSet(id) {
 }
 
 export function getCodeGroups() {
-    return getData(CODE_GROUPS_KEY);
+    const codeGroups = getData(CODE_GROUPS_KEY);
+    return codeGroups.map((item) => ({
+        ...item,
+        effectiveDate: formatDate(item.effectiveDate),
+        lastUpdated: formatDate(item.lastUpdated)
+    }));
 }
 
 export function addCodeGroup(newItem) {

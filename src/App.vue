@@ -1,12 +1,12 @@
 <template>
     <div id="app">
-        <Leftside />
+        <Main />
         <router-link to="/" />
     </div>
 </template>
 
 <script setup>
-import Leftside from './components/Leftside.vue';
+import Main from './views/Main.vue';
 </script>
 
 <style scoped></style>

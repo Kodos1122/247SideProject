@@ -49,17 +49,17 @@
 
 <script setup>
 import { ref, watch } from 'vue';
-import Navbar from '../components/Navbar.vue';
-import CodeSets from '../modules/Codesets.vue';
-import CodeGroups from '../modules/Codegroups.vue';
-import Dialog from '../components/Dialog.vue';
-import { useMainStore } from '../stores/useStore';
+import Navbar from '../../../components/Navbar.vue';
+import CodeSets from '../../plans/components/services/Codesets.vue';
+import CodeGroups from '../../plans/components/services/Codegroups.vue';
+import Dialog from '../components/services/dialogs/Dialog.vue';
+import { useMainStore } from '../../../stores/useStore';
 import {
     addCodeSet,
     updateCodeSet,
     addCodeGroup,
     updateCodeGroup
-} from '../stores/localStorageData';
+} from '../../../stores/localStorageData';
 
 const mainStore = useMainStore();
 const currentSubTab = ref('Code Sets');

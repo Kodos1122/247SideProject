@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useMainStore } from '../stores/useStore';
-import Benefits from '../views/Benefits.vue';
-import Benefitgroups from '../views/Benefitgroups.vue';
-import Plans from '../views/Plans.vue';
-import Clients from '../views/Clients.vue';
-import Admin from '../views/Admin.vue';
-import Dashboard from '../views/Dashboard.vue';
-import Services from '../views/Services.vue';
+import Benefits from '../modules/plans/components/benefits/Benefits.vue';
+import Benefitgroups from '../modules/plans/components/benefit-groups/Benefitgroups.vue';
+import Plans from '../modules/plans/components/plans/Plans.vue';
+import Clients from '../modules/clients/Clients.vue';
+import Admin from '../modules/administration/Admin.vue';
+import Dashboard from '../modules/dashboard/Dashboard.vue';
+import Services from '../modules/plans/views/Services.vue';
 
 const routes = [
     { path: '/', redirect: '/dashboard' },
@@ -24,7 +24,6 @@ const router = createRouter({
     routes
 });
 
-// Define tabs and sub-tabs mapping
 const mainTabs = {
     '/dashboard': 'Dashboard',
     '/services': 'Services',

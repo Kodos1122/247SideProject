@@ -87,7 +87,7 @@
 </template>
 
 <script setup>
-import { useMainStore } from '../stores/useStore';
+import { useMainStore } from '../../stores/useStore';
 
 const mainStore = useMainStore();
 </script>
