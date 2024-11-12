@@ -22,6 +22,7 @@ import ConfirmDialog from 'primevue/confirmdialog';
 import ConfirmationService from 'primevue/confirmationservice';
 import Toast from 'primevue/toast';
 import ToastService from 'primevue/toastservice';
+import Dropdown from 'primevue/dropdown';
 
 const app = createApp(App);
 
@@ -40,5 +41,6 @@ app.component('InputText', InputText);
 app.component('Calendar', Calendar);
 app.component('ConfirmDialog', ConfirmDialog);
 app.component('Toast', Toast);
+app.component('Dropdowm', Dropdown);
 
 app.mount('#app');

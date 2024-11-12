@@ -11,24 +11,23 @@
 
         <div v-if="itemType === 'Code Sets'" class="form-fields">
             <div class="form-field mb-7 p-float-label font-bold">
-                <InputText v-model="currentItem.name" id="codeSetsName" />
-                <label for="codeSetsName">Name</label>
+                <InputText v-model="currentItem.name.en" id="codeSetsNameEn" />
+                <label for="codeSetsNameEn">Name</label>
+            </div>
+            <div class="form-field mb-7 p-float-label font-bold">
+                <InputText
+                    v-model="currentItem.description.en"
+                    id="codeSetsDescriptionEn"
+                />
+                <label for="codeSetsDescriptionEn">Description</label>
             </div>
             <div class="form-field mb-7 p-float-label font-bold">
                 <Calendar
                     dateFormat="yy/mm/dd"
-                    v-model="currentItem.effectiveDate"
+                    v-model="currentItem.effective_date"
                     id="codeSetsEffectiveDate"
                 />
                 <label for="codeSetsEffectiveDate">Effective Date</label>
-            </div>
-            <div class="form-field mb-7 p-float-label font-bold">
-                <Calendar
-                    dateFormat="yy/mm/dd"
-                    v-model="currentItem.lastUpdated"
-                    id="codeSetsLastUpdated"
-                />
-                <label for="codeSetsLastUpdated">Last Updated</label>
             </div>
             <div class="form-field mb-4 p-float-label font-bold">
                 <InputText v-model="currentItem.status" id="codeSetsStatus" />
@@ -38,24 +37,36 @@
 
         <div v-if="itemType === 'Code Groups'" class="form-fields">
             <div class="form-field mb-7 p-float-label font-bold">
-                <InputText v-model="currentItem.name" id="codeGroupsName" />
-                <label for="codeGroupsName">Name</label>
+                <InputText
+                    v-model="currentItem.name.en"
+                    id="codeGroupsNameEn"
+                />
+                <label for="codeGroupsNameEn">Name</label>
+            </div>
+            <div class="form-field mb-7 p-float-label font-bold">
+                <InputText
+                    v-model="currentItem.description.en"
+                    id="codeGroupsDescriptionEn"
+                />
+                <label for="codeGroupsDescriptionEn">Description</label>
+            </div>
+            <div class="form-field mb-7 p-float-label font-bold">
+                <Dropdown
+                    v-model="currentItem.service_code_set"
+                    :options="codeSetsOptions"
+                    optionLabel="name"
+                    optionValue="id"
+                    id="codeGroupsServiceCodeSet"
+                />
+                <label for="codeGroupsServiceCodeSet">Service Code Set</label>
             </div>
             <div class="form-field mb-7 p-float-label font-bold">
                 <Calendar
                     dateFormat="yy/mm/dd"
-                    v-model="currentItem.effectiveDate"
+                    v-model="currentItem.effective_date"
                     id="codeGroupsEffectiveDate"
                 />
                 <label for="codeGroupsEffectiveDate">Effective Date</label>
-            </div>
-            <div class="form-field mb-7 p-float-label font-bold">
-                <Calendar
-                    dateFormat="yy/mm/dd"
-                    v-model="currentItem.lastUpdated"
-                    id="codeGroupsLastUpdated"
-                />
-                <label for="codeGroupsLastUpdated">Last Updated</label>
             </div>
             <div class="form-field mb-4 p-float-label font-bold">
                 <InputText v-model="currentItem.status" id="codeGroupsStatus" />
@@ -69,20 +80,8 @@
                 class="p-button-outlined"
                 @click="hideDialog"
             />
-            <Button
-                label="Save"
-                class="p-button-success"
-                @click="confirmSave"
-            />
+            <Button label="Save" class="p-button-success" @click="handleSave" />
         </div>
-
-        <ConfirmDialogComponent
-            ref="confirmDialog"
-            @confirm="handleConfirmSave"
-            @cancel="handleCancelSave"
-            message="Are you sure you want to save this information?"
-            header="Save Confirmation"
-        />
 
         <Toast position="top-right" />
     </Dialog>
@@ -94,54 +93,104 @@ import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import Calendar from 'primevue/calendar';
-import ConfirmDialogComponent from './ConfirmDialog.vue';
+import Dropdown from 'primevue/dropdown';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
+import {
+    addCodeSet,
+    updateCodeSet,
+    addCodeGroup,
+    updateCodeGroup
+} from '../../../../../stores/localStorageData';
 
 const toast = useToast();
-const confirmDialog = ref(null);
-const isConfirmDialogVisible = ref(false);
-
 const props = defineProps({
     visible: Boolean,
     itemType: String,
     actionType: String,
     itemData: Object
 });
-
-const emit = defineEmits(['update:visible', 'save']);
+const emit = defineEmits(['update:visible', 'save', 'data-saved']);
 
 const isVisible = computed({
     get: () => props.visible,
     set: (value) => emit('update:visible', value)
 });
 
-const currentItem = ref({ ...props.itemData });
+const currentItem = ref({
+    name: { en: '', fr: '' },
+    description: { en: '', fr: '' },
+    effective_date: '',
+    status: '',
+    is_locked: false,
+    service_code_set: ''
+});
+
 const dialogHeader = computed(() => `${props.actionType} ${props.itemType}`);
 
 function hideDialog() {
     emit('update:visible', false);
 }
 
-function confirmSave() {
-    if (!isConfirmDialogVisible.value) {
-        isConfirmDialogVisible.value = true;
-        confirmDialog.value.openConfirmDialog();
+async function handleSave() {
+    const itemToSave = {
+        ...currentItem.value,
+        effective_date: currentItem.value.effective_date
+            ? formatDateToUTC(currentItem.value.effective_date)
+            : ''
+    };
+
+    try {
+        if (props.itemType === 'Code Sets') {
+            if (props.actionType === 'Add') {
+                await addCodeSet(itemToSave);
+            } else {
+                if (!currentItem.value.id) {
+                    throw new Error('Code Set ID is missing or undefined.');
+                }
+                await updateCodeSet(itemToSave);
+            }
+        } else if (props.itemType === 'Code Groups') {
+            if (props.actionType === 'Add') {
+                await addCodeGroup(itemToSave);
+            } else {
+                if (!currentItem.value.id) {
+                    throw new Error('Code Group ID is missing or undefined.');
+                }
+                await updateCodeGroup(itemToSave);
+            }
+        }
+        showSuccessMessage();
+        emit('save');
+        emit('data-saved');
+        hideDialog();
+    } catch (error) {
+        handleSaveError(error);
     }
 }
 
-function handleConfirmSave() {
-    save();
-    showSuccessMessage();
-    isConfirmDialogVisible.value = false;
+function handleSaveError(error) {
+    if (error.response && error.response.data) {
+        console.error('Validation Error:', error.response.data);
+    } else {
+        console.error('Error saving item:', error);
+    }
+    toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to save item.',
+        life: 3000
+    });
 }
 
-function handleCancelSave() {
-    isConfirmDialogVisible.value = false;
-}
-
-function save() {
-    emit('save', currentItem.value);
+function formatDateToUTC(date) {
+    const d = new Date(
+        Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+    );
+    const year = d.getUTCFullYear();
+    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 function showSuccessMessage() {
@@ -156,7 +205,23 @@ function showSuccessMessage() {
 watch(
     () => props.itemData,
     (newData) => {
-        currentItem.value = { ...newData };
+        currentItem.value = {
+            ...newData,
+            name:
+                typeof newData.name === 'object'
+                    ? newData.name
+                    : { en: newData.name || '', fr: '' },
+            description:
+                typeof newData.description === 'object'
+                    ? newData.description
+                    : { en: newData.description || '', fr: '' },
+            effective_date: newData.effective_date
+                ? new Date(newData.effective_date)
+                : '',
+            status: newData.status || '',
+            is_locked: newData.is_locked || false,
+            service_code_set: newData.service_code_set || ''
+        };
     },
     { immediate: true }
 );

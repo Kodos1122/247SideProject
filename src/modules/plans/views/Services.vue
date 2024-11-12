@@ -79,14 +79,22 @@ function selectSubTab(subTabName) {
 }
 
 function handleAddNewData() {
+    currentItem.value = {
+        name: { en: '', fr: '' },
+        description: { en: '', fr: '' },
+        effective_date: '',
+        status: '',
+        is_locked: false,
+        service_code_set: ''
+    };
     dialogAction.value = 'Add';
-    currentItem.value = {};
     dialogVisible.value = true;
 }
 
 function editItem(item) {
-    dialogAction.value = 'Edit';
+    console.log('Editing Item:', item);
     currentItem.value = { ...item };
+    dialogAction.value = 'Edit';
     dialogVisible.value = true;
 }
 
@@ -117,8 +125,4 @@ function refreshData() {
 }
 </script>
 
-<style scoped>
-.nav {
-    margin-bottom: 20px;
-}
-</style>
+<style scoped></style>
