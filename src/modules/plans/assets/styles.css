@@ -4,8 +4,10 @@
 
 .tabs-container {
     display: flex;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #ddd;
+    margin-bottom: 30px;
+    width: 100%;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    border-bottom: px solid #ddd;
 }
 
 .tab-button {
@@ -62,12 +64,6 @@
     box-shadow: 0 0 10px #14377d;
 }
 
-.table-container {
-    width: 100%;
-    border-collapse: collapse;
-    box-shadow: 0 6px 6px rgba(0, 0, 0, 0.1);
-}
-
 .action-button {
     padding: 5px 10px;
     margin-right: 5px;
@@ -113,7 +109,7 @@
 
 .form-field .p-float-label label {
     color: #5a6b7b;
-    font-weight: 500;
+    font-weight: 100;
     transition: color 0.2s ease;
 }
 
@@ -130,7 +126,7 @@
 }
 
 .form-field .p-inputtext:focus {
-    border-color: #007bff;
+    border-color: #14377d;
     box-shadow: 0px 0px 6px rgba(0, 123, 255, 0.25);
 }
 
@@ -151,8 +147,40 @@
 }
 
 .form-field .p-calendar .p-inputtext:focus {
-    border-color: #007bff;
+    border-color: #14377d;
     box-shadow: 0px 0px 6px rgba(0, 123, 255, 0.25);
+}
+
+.form-field .p-dropdown {
+    width: 100%;
+    padding: 0rem;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    background-color: #ffffff;
+    transition:
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
+    box-sizing: inherit;
+}
+
+.form-field .p-dropdown .p-dropdown-label {
+    padding: 12px;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.form-field .p-dropdown:focus-within {
+    border-color: #14377d;
+    box-shadow: 0px 0px 6px rgba(0, 123, 255, 0.25);
+}
+
+.form-field .p-dropdown .p-dropdown-trigger {
+    color: #5a6b7b;
+}
+
+.form-field .p-dropdown .p-dropdown-items {
+    border-radius: 8px;
+    border-color: #ced4da;
 }
 
 .p-button-outlined {
@@ -250,23 +278,23 @@
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.table-container .datatable .p-paginator {
-    background-color: #fffbfb;
-    padding: px;
+.table-container .p-paginator {
+    background-color: transparent;
     border-radius: 8px;
+    font-size: small;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    color: #9aa1b2;
     box-shadow: rgba(0, 0, 0, 0.1);
 }
 
 .table-container .p-paginator .p-paginator-pages .p-paginator-page {
     color: #4a4a4a;
-    width: 10px;
-    height: 45px;
-    margin: 0 8px;
     background-color: transparent;
-    position: relative;
+    padding: 5px 12px 5px 12px;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
     transition:
         background-color 0.2s ease,
         color 0.2s ease;
@@ -274,6 +302,9 @@
 
 .table-container .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
     color: #14377d;
+    margin: 0 8px;
+    min-width: min-content;
+    height: fit-content;
     font-weight: bold;
     background-color: rgba(4, 123, 250, 0.147);
 }
@@ -281,4 +312,51 @@
 .table-container .p-paginator .p-paginator-pages .p-paginator-page:hover {
     background-color: rgba(0, 123, 255, 0.147);
     cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.table-container .p-paginator .p-paginator-icon {
+    color: #9aa1b2;
+    width: 30px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.table-container .p-paginator .p-paginator-icon:hover {
+    background-color: rgba(0, 123, 255, 0.147);
+    color: #9aa1b2 !important;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.table-container .p-paginator .p-paginator-rpp-options {
+    background-color: transparent;
+    height: 35px;
+    border: 1px solid #9aa1b2;
+    border-radius: 15px;
+    color: #4a4a4a;
+    align-items: center;
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.table-container .p-paginator .p-paginator-rpp-options:hover {
+    border-color: #14377d;
+    background-color: rgba(20, 55, 125, 0.05);
+}
+
+.table-container
+    .p-paginator
+    .p-paginator-rpp-options
+    .p-dropdown-trigger-icon {
+    color: #9aa1b2;
 }

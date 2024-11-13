@@ -7,21 +7,23 @@
         closable
         @hide="hideDialog"
     >
-        <span class="text-gray-500 block mb-6">Fill in the details below.</span>
+        <span class="text-gray-500 block mb-6 ml-4"
+            >Fill in the details below.</span
+        >
 
         <div v-if="itemType === 'Code Sets'" class="form-fields">
-            <div class="form-field mb-7 p-float-label font-bold">
+            <div class="form-field mb-7 p-float-label font-semibold">
                 <InputText v-model="currentItem.name.en" id="codeSetsNameEn" />
                 <label for="codeSetsNameEn">Name</label>
             </div>
-            <div class="form-field mb-7 p-float-label font-bold">
+            <div class="form-field mb-7 p-float-label font-semibold">
                 <InputText
                     v-model="currentItem.description.en"
                     id="codeSetsDescriptionEn"
                 />
                 <label for="codeSetsDescriptionEn">Description</label>
             </div>
-            <div class="form-field mb-7 p-float-label font-bold">
+            <div class="form-field mb-7 p-float-label font-semibold">
                 <Calendar
                     dateFormat="yy/mm/dd"
                     v-model="currentItem.effective_date"
@@ -29,30 +31,30 @@
                 />
                 <label for="codeSetsEffectiveDate">Effective Date</label>
             </div>
-            <div class="form-field mb-4 p-float-label font-bold">
+            <div class="form-field mb-4 p-float-label font-semibold">
                 <InputText v-model="currentItem.status" id="codeSetsStatus" />
                 <label for="codeSetsStatus">Status</label>
             </div>
         </div>
 
         <div v-if="itemType === 'Code Groups'" class="form-fields">
-            <div class="form-field mb-7 p-float-label font-bold">
+            <div class="form-field mb-7 p-float-label font-semibold">
                 <InputText
                     v-model="currentItem.name.en"
                     id="codeGroupsNameEn"
                 />
                 <label for="codeGroupsNameEn">Name</label>
             </div>
-            <div class="form-field mb-7 p-float-label font-bold">
+            <div class="form-field mb-7 p-float-label font-semibold">
                 <InputText
                     v-model="currentItem.description.en"
                     id="codeGroupsDescriptionEn"
                 />
                 <label for="codeGroupsDescriptionEn">Description</label>
             </div>
-            <div class="form-field mb-7 p-float-label font-bold">
+            <div class="form-field mb-7 p-float-label font-semibold">
                 <Dropdown
-                    v-model="currentItem.service_code_set"
+                    v-model="currentItem.service_code_set.id"
                     :options="codeSetsOptions"
                     optionLabel="name"
                     optionValue="id"
@@ -60,7 +62,7 @@
                 />
                 <label for="codeGroupsServiceCodeSet">Service Code Set</label>
             </div>
-            <div class="form-field mb-7 p-float-label font-bold">
+            <div class="form-field mb-7 p-float-label font-semibold">
                 <Calendar
                     dateFormat="yy/mm/dd"
                     v-model="currentItem.effective_date"
@@ -68,7 +70,7 @@
                 />
                 <label for="codeGroupsEffectiveDate">Effective Date</label>
             </div>
-            <div class="form-field mb-4 p-float-label font-bold">
+            <div class="form-field mb-4 p-float-label font-semibold">
                 <InputText v-model="currentItem.status" id="codeGroupsStatus" />
                 <label for="codeGroupsStatus">Status</label>
             </div>
@@ -108,7 +110,8 @@ const props = defineProps({
     visible: Boolean,
     itemType: String,
     actionType: String,
-    itemData: Object
+    itemData: Object,
+    codeSetsOptions: Array
 });
 const emit = defineEmits(['update:visible', 'save', 'data-saved']);
 
@@ -123,7 +126,7 @@ const currentItem = ref({
     effective_date: '',
     status: '',
     is_locked: false,
-    service_code_set: ''
+    service_code_set: { id: '', name: '' }
 });
 
 const dialogHeader = computed(() => `${props.actionType} ${props.itemType}`);
@@ -151,6 +154,7 @@ async function handleSave() {
                 await updateCodeSet(itemToSave);
             }
         } else if (props.itemType === 'Code Groups') {
+            itemToSave.service_code_set = currentItem.value.service_code_set.id;
             if (props.actionType === 'Add') {
                 await addCodeGroup(itemToSave);
             } else {
@@ -220,7 +224,10 @@ watch(
                 : '',
             status: newData.status || '',
             is_locked: newData.is_locked || false,
-            service_code_set: newData.service_code_set || ''
+            service_code_set: newData.service_code_set || {
+                id: '',
+                name: ''
+            }
         };
     },
     { immediate: true }

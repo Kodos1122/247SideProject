@@ -1,4 +1,3 @@
-<!-- Leftside.vue -->
 <template>
     <aside
         :class="{

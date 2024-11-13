@@ -14,13 +14,8 @@ const props = defineProps({
 
 const emit = defineEmits(['confirm', 'cancel']);
 const confirm = useConfirm();
-let dialogOpen = false;
 
 function openConfirmDialog() {
-    if (dialogOpen) return;
-
-    dialogOpen = true;
-
     confirm.require({
         message: props.message,
         header: props.header,
@@ -29,11 +24,9 @@ function openConfirmDialog() {
         rejectClass: props.rejectClass,
         accept: () => {
             emit('confirm');
-            dialogOpen = false;
         },
         reject: () => {
             emit('cancel');
-            dialogOpen = false;
         }
     });
 }

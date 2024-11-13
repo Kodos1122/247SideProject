@@ -11,7 +11,7 @@
         </div>
         <DataTable
             :value="filteredGroups"
-            class="table-container text-sm"
+            class="table-container text-sm divide-y divide-gray-400"
             responsiveLayout="scroll"
             paginator
             :rows="5"
@@ -43,12 +43,19 @@
             </Column>
         </DataTable>
         <Toast position="top-right" />
+        <ConfirmDialogComponent
+            ref="confirmDialog"
+            @confirm="handleDelete"
+            @cancel="cancelDelete"
+            message="Are you sure you want to delete this code group?"
+            header="Delete Confirmation"
+        />
         <Dialog
             :visible="dialogVisible"
             :itemType="'Code Groups'"
             :actionType="dialogAction"
             :itemData="currentGroup"
-            :codeSets="codeSets"
+            :codeSetsOptions="codeSets"
             @update:visible="dialogVisible = $event"
             @data-saved="loadData"
         />
@@ -56,10 +63,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Toast from 'primevue/toast';
+import ConfirmDialogComponent from './dialogs/ConfirmDialog.vue';
 import { useToast } from 'primevue/usetoast';
 import Dialog from '../services/dialogs/Dialog.vue';
 import {
@@ -80,8 +88,9 @@ const currentGroup = ref({
     effective_date: '',
     status: 'active',
     is_locked: false,
-    service_code_set: ''
+    service_code_set: { id: '', name: '' }
 });
+const confirmDialog = ref(null);
 
 async function loadData() {
     try {
@@ -112,6 +121,11 @@ async function loadCodeSets() {
 onMounted(() => {
     loadData();
     loadCodeSets();
+    document.addEventListener('refreshCodeSets', loadData);
+});
+
+onBeforeUnmount(() => {
+    document.removeEventListener('refreshCodeSets', loadData);
 });
 
 const filteredGroups = computed(() => {
@@ -121,14 +135,22 @@ const filteredGroups = computed(() => {
 });
 
 function editGroup(group) {
-    currentGroup.value = { ...group };
+    currentGroup.value = {
+        ...group,
+        service_code_set: group.service_code_set || { id: '', name: '' }
+    };
     dialogAction.value = 'Edit';
     dialogVisible.value = true;
 }
 
-async function confirmDelete(group) {
+function confirmDelete(group) {
+    currentGroup.value = { ...group };
+    confirmDialog.value.openConfirmDialog();
+}
+
+async function handleDelete() {
     try {
-        await deleteCodeGroup(group.id);
+        await deleteCodeGroup(currentGroup.value.id);
         loadData();
         toast.add({
             severity: 'success',
@@ -143,7 +165,13 @@ async function confirmDelete(group) {
             detail: 'Failed to delete code group',
             life: 3000
         });
+    } finally {
+        currentGroup.value = {};
     }
+}
+
+function cancelDelete() {
+    currentGroup.value = {};
 }
 
 function addGroup() {
@@ -153,7 +181,7 @@ function addGroup() {
         effective_date: '',
         status: 'active',
         is_locked: false,
-        service_code_set: ''
+        service_code_set: { id: '', name: '' }
     };
     dialogAction.value = 'Add';
     dialogVisible.value = true;

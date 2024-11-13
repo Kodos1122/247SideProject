@@ -11,11 +11,12 @@
         </div>
         <DataTable
             :value="filteredServices"
-            class="table-container text-sm"
+            class="table-container text-sm divide-y divide-gray-400"
             responsiveLayout="scroll"
             paginator
             :rows="5"
             :rowsPerPageOptions="[5, 10, 20, 50]"
+            stripedRows
         >
             <Column field="name" header="Name" sortable></Column>
             <Column

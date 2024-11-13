@@ -76,7 +76,7 @@ export async function getCodeGroups() {
             service_code_set: item.service_code_set
         }));
     } catch (error) {
-        console.error('Error fetching Code Groups:', error);
+        handleApiError(error, 'fetching Code Groups');
         throw error;
     }
 }
@@ -84,11 +84,16 @@ export async function getCodeGroups() {
 export async function addCodeGroup(newItem) {
     try {
         console.log('Adding Code Group:', newItem);
-        const response = await api.post('/api/v1/service-code-groups', newItem);
+        const payload = {
+            ...newItem,
+            service_code_set_id: newItem.service_code_set.id
+        };
+        const response = await api.post('/api/v1/service-code-groups', payload);
         console.log('Code Group added successfully:', response.data);
         return response.data;
     } catch (error) {
         handleApiError(error, 'adding Code Group');
+        throw error;
     }
 }
 
@@ -97,21 +102,32 @@ export async function updateCodeGroup(updatedItem) {
         throw new Error('Code Group ID is missing or undefined.');
     }
     try {
+        const payload = {
+            name: updatedItem.name,
+            description: updatedItem.description,
+            effective_date: updatedItem.effective_date,
+            status: updatedItem.status,
+            service_code_set_id: updatedItem.service_code_set.id
+        };
         const response = await api.put(
             `/api/v1/service-code-groups/${updatedItem.id}`,
-            updatedItem
+            payload
         );
+        console.log('Code Group updated successfully:', response.data);
         return response.data;
     } catch (error) {
         handleApiError(error, 'updating Code Group');
+        throw error;
     }
 }
 
 export async function deleteCodeGroup(id) {
     try {
         await api.delete(`/api/v1/service-code-groups/${id}`);
+        console.log(`Code Group with ID ${id} deleted successfully.`);
     } catch (error) {
         handleApiError(error, 'deleting Code Group');
+        throw error;
     }
 }
 
@@ -130,5 +146,4 @@ function handleApiError(error, action) {
     } else {
         console.error(`Error ${action}:`, error);
     }
-    throw error;
 }
