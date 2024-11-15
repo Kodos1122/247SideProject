@@ -85,13 +85,13 @@
 }
 
 .delete-button {
-    background-color: #dc3545;
+    background-color: #c2091c;
     color: white;
 }
 
 .delete-button:hover {
     transition: 300ms;
-    background-color: #e67472;
+    background-color: #ef4444;
 }
 
 .custom-dialog {
@@ -359,4 +359,23 @@
     .p-paginator-rpp-options
     .p-dropdown-trigger-icon {
     color: #9aa1b2;
+}
+
+.status-badge {
+    padding: 0.28rem 0.3rem;
+    border-radius: 8px;
+    color: #fff;
+    text-align: center;
+    display: inline-block;
+    font-size: 0.7rem;
+}
+.status-active {
+    background-color: #22c55e;
+}
+.status-inactive {
+    background-color: #ef4444;
+}
+
+.action-button {
+    margin-right: 0.7rem;
 }
