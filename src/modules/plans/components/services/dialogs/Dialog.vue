@@ -136,6 +136,8 @@ function hideDialog() {
 }
 
 async function handleSave() {
+    if (!validateInputs()) return;
+
     const itemToSave = {
         ...currentItem.value,
         effective_date: currentItem.value.effective_date
@@ -171,6 +173,35 @@ async function handleSave() {
     } catch (error) {
         handleSaveError(error);
     }
+}
+
+function validateInputs() {
+    const requiredFields = [
+        'name.en',
+        'description.en',
+        'effective_date',
+        'status'
+    ];
+    const missingFields = requiredFields.filter((field) => {
+        const value = field
+            .split('.')
+            .reduce(
+                (obj, key) => (obj ? obj[key] : undefined),
+                currentItem.value
+            );
+        return !value;
+    });
+
+    if (missingFields.length) {
+        toast.add({
+            severity: 'error',
+            summary: 'Validation Error',
+            detail: 'Please fill in all required fields.',
+            life: 3000
+        });
+        return false;
+    }
+    return true;
 }
 
 function handleSaveError(error) {
