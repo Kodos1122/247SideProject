@@ -6,7 +6,6 @@ import router from './router';
 
 // Global CSS and PrimeVue theme
 import './assets/layout/main.css';
-import './assets/layout/styles.css';
 import '../src/modules/plans/assets/styles.css';
 import 'primevue/resources/themes/lara-light-blue/theme.css';
 import 'primevue/resources/primevue.min.css';
