@@ -125,13 +125,13 @@ const mainTab = computed(() => mainStore.mainTab);
 }
 .action-button-primary {
     padding: 8px 16px;
-    background-color: #07b52d;
+    background-color: #2467ba;
     color: var(--surface-0);
     font-weight: bold;
     transition: background-color 0.2s ease;
 }
 .action-button-primary:hover {
-    background-color: #045f13;
+    background-color: #22c55e;
 }
 
 .card {
