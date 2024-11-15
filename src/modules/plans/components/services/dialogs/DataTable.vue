@@ -19,12 +19,31 @@
             :stripedRows="stripedRows"
         >
             <Column
-                v-for="(col, index) in columns"
+                v-for="(col, index) in displayColumns"
                 :key="index"
                 :field="col.field"
                 :header="col.header"
                 :sortable="col.sortable"
             ></Column>
+
+            <Column field="status" header="Status" sortable>
+                <template #body="slotProps">
+                    <span
+                        :class="{
+                            'status-badge': true,
+                            'status-active':
+                                slotProps.data.status?.toUpperCase() ===
+                                'ACTIVE',
+                            'status-inactive':
+                                slotProps.data.status?.toUpperCase() ===
+                                'INACTIVE'
+                        }"
+                    >
+                        {{ slotProps.data.status?.toUpperCase() || 'UNKNOWN' }}
+                    </span>
+                </template>
+            </Column>
+
             <Column header="Actions">
                 <template #body="slotProps">
                     <button
@@ -43,7 +62,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 
@@ -58,6 +77,10 @@ const props = defineProps({
 
 const search = ref('');
 
+const displayColumns = computed(() => {
+    return props.columns.filter((col) => col.field !== 'status');
+});
+
 const filteredData = computed(() => {
     if (!search.value) return props.value;
     return props.value.filter((item) =>
@@ -67,5 +90,10 @@ const filteredData = computed(() => {
             .includes(search.value.toLowerCase())
     );
 });
+
+watch(props.value, () => {
+    search.value = '';
+});
 </script>
+
 <style scoped></style>
