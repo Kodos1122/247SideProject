@@ -99,20 +99,6 @@ function editItem(item) {
 }
 
 function saveItem(item) {
-    if (currentSubTab.value === 'Code Sets') {
-        if (dialogAction.value === 'Add') {
-            addCodeSet(item);
-        } else {
-            updateCodeSet(item);
-        }
-    } else if (currentSubTab.value === 'Code Groups') {
-        if (dialogAction.value === 'Add') {
-            addCodeGroup(item);
-        } else {
-            updateCodeGroup(item);
-        }
-    }
-    dialogVisible.value = false;
     refreshData();
 }
 
