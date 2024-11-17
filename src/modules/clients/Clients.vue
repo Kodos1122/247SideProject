@@ -8,7 +8,7 @@
         <div class="content-container">
             <div class="header-container">
                 <div class="page-title-container">
-                    <h1 class="page-title">Customers</h1>
+                    <h1 class="page-title">Clients</h1>
                     <div class="stats-container">
                         <div class="stat-item">
                             <i class="pi pi-users stat-icon" />
@@ -17,10 +17,6 @@
                         <div class="stat-item">
                             <i class="pi pi-globe stat-icon" />
                             <span>9402 Sessions</span>
-                        </div>
-                        <div class="stat-item">
-                            <i class="pi pi-clock stat-icon" />
-                            <span>2.32m Avg. Duration</span>
                         </div>
                     </div>
                 </div>
