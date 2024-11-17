@@ -198,3 +198,18 @@ export async function deleteCodeGroup(id) {
         throw error;
     }
 }
+
+// Fetch Code Sets specifically for Code Groups
+export async function fetchCodeSetsForCodeGroups() {
+    try {
+        const response = await api.get('/api/v1/service-code-sets?'); // Use the same endpoint
+        return response.data.data.map((item) => ({
+            id: item.id,
+            name: item.name.en, // Include only necessary fields for Code Group use
+            description: item.description.en
+        }));
+    } catch (error) {
+        handleApiError(error, 'fetching Code Sets for Code Groups');
+        throw error;
+    }
+}
