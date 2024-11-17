@@ -1,15 +1,73 @@
 import axios from 'axios';
 
-const token = 'Token_Here';
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL; // Load base URL
+const loginEndpoint = `${apiBaseUrl}/api/cognito/login`;
 
+let token = ''; // Store the token globally
+
+// Function to fetch token dynamically
+async function fetchToken() {
+    try {
+        const response = await axios.post(
+            loginEndpoint,
+            {
+                email: import.meta.env.VITE_API_EMAIL, // Access email
+                password: import.meta.env.VITE_API_PASSWORD // Access password
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+        console.log('Token fetched successfully');
+        return response.data.access_token;
+    } catch (error) {
+        console.error('Error fetching token:', error);
+        throw error;
+    }
+}
+
+// Initialize Axios instance
 const api = axios.create({
-    baseURL: 'https://api.client.develop.horus.guardme.dev',
+    baseURL: import.meta.env.VITE_API_BASE_URL,
     headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        Authorization: `Bearer ${token}`
+        'Content-Type': 'application/json; charset=utf-8'
     }
 });
 
+// Add a request interceptor to inject token dynamically
+api.interceptors.request.use(
+    async (config) => {
+        if (!token) {
+            token = await fetchToken(); // Fetch token if not already set
+        }
+        config.headers.Authorization = `Bearer ${token}`;
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
+// Function to handle API errors
+function handleApiError(error, action) {
+    if (error.response && error.response.data) {
+        console.error(`Validation Error ${action}:`, error.response.data);
+    } else {
+        console.error(`Error ${action}:`, error);
+    }
+}
+
+// Utility function to format dates
+function formatDateToUTC(date) {
+    if (!date) return '';
+    const d = new Date(date);
+    const year = d.getUTCFullYear();
+    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+// Fetch Code Sets
 export async function getCodeSets() {
     try {
         const response = await api.get('/api/v1/service-code-sets?');
@@ -23,22 +81,23 @@ export async function getCodeSets() {
             isLocked: item.is_locked
         }));
     } catch (error) {
-        console.error('Error fetching Code Sets:', error);
+        handleApiError(error, 'fetching Code Sets');
         throw error;
     }
 }
 
 export async function addCodeSet(newItem) {
     try {
-        console.log('Adding Code Set:', newItem);
         const response = await api.post('/api/v1/service-code-sets', newItem);
         console.log('Code Set added successfully:', response.data);
-        return response.data;
+        return response.data; // Only log once when successful
     } catch (error) {
         handleApiError(error, 'adding Code Set');
+        throw error;
     }
 }
 
+// Update a Code Set
 export async function updateCodeSet(updatedItem) {
     if (!updatedItem.id) {
         throw new Error('Code Set ID is missing or undefined.');
@@ -48,20 +107,26 @@ export async function updateCodeSet(updatedItem) {
             `/api/v1/service-code-sets/${updatedItem.id}`,
             updatedItem
         );
+        console.log('Code Set updated successfully:', response.data);
         return response.data;
     } catch (error) {
         handleApiError(error, 'updating Code Set');
+        throw error;
     }
 }
 
+// Delete a Code Set
 export async function deleteCodeSet(id) {
     try {
         await api.delete(`/api/v1/service-code-sets/${id}`);
+        console.log(`Code Set with ID ${id} deleted successfully.`);
     } catch (error) {
         handleApiError(error, 'deleting Code Set');
+        throw error;
     }
 }
 
+// Fetch Code Groups
 export async function getCodeGroups() {
     try {
         const response = await api.get('/api/v1/service-code-groups?');
@@ -81,6 +146,7 @@ export async function getCodeGroups() {
     }
 }
 
+// Add a new Code Group
 export async function addCodeGroup(newItem) {
     try {
         console.log('Adding Code Group:', newItem);
@@ -97,6 +163,7 @@ export async function addCodeGroup(newItem) {
     }
 }
 
+// Update a Code Group
 export async function updateCodeGroup(updatedItem) {
     if (!updatedItem.id) {
         throw new Error('Code Group ID is missing or undefined.');
@@ -121,6 +188,7 @@ export async function updateCodeGroup(updatedItem) {
     }
 }
 
+// Delete a Code Group
 export async function deleteCodeGroup(id) {
     try {
         await api.delete(`/api/v1/service-code-groups/${id}`);
@@ -128,22 +196,5 @@ export async function deleteCodeGroup(id) {
     } catch (error) {
         handleApiError(error, 'deleting Code Group');
         throw error;
-    }
-}
-
-function formatDateToUTC(date) {
-    if (!date) return '';
-    const d = new Date(date);
-    const year = d.getUTCFullYear();
-    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(d.getUTCDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-}
-
-function handleApiError(error, action) {
-    if (error.response && error.response.data) {
-        console.error(`Validation Error ${action}:`, error.response.data);
-    } else {
-        console.error(`Error ${action}:`, error);
     }
 }
