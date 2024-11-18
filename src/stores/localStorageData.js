@@ -151,8 +151,11 @@ export async function addCodeGroup(newItem) {
     try {
         console.log('Adding Code Group:', newItem);
         const payload = {
-            ...newItem,
-            service_code_set_id: newItem.service_code_set.id
+            name: newItem.name,
+            description: newItem.description,
+            effective_date: newItem.effective_date,
+            status: newItem.status,
+            service_code_set_id: newItem.service_code_set_id // Correct field name
         };
         const response = await api.post('/api/v1/service-code-groups', payload);
         console.log('Code Group added successfully:', response.data);
@@ -174,7 +177,7 @@ export async function updateCodeGroup(updatedItem) {
             description: updatedItem.description,
             effective_date: updatedItem.effective_date,
             status: updatedItem.status,
-            service_code_set_id: updatedItem.service_code_set.id
+            service_code_set_id: updatedItem.service_code_set_id
         };
         const response = await api.put(
             `/api/v1/service-code-groups/${updatedItem.id}`,

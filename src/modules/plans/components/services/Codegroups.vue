@@ -101,12 +101,11 @@ async function loadCodeSets(forceReload = false) {
 
 onMounted(() => {
     loadData();
-    loadCodeSets();
-    document.addEventListener('refreshCodeSets', loadData);
+    document.addEventListener('refreshCodeGroups', loadData);
 });
 
 onBeforeUnmount(() => {
-    document.removeEventListener('refreshCodeSets', loadData);
+    document.removeEventListener('refreshCodeGroups', loadData);
 });
 
 const filteredGroups = computed(() => {

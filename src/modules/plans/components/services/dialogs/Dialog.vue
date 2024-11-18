@@ -145,6 +145,12 @@ async function handleSave() {
             : ''
     };
 
+    // Add `service_code_set_id` mapping for Code Groups
+    if (props.itemType === 'Code Groups') {
+        itemToSave.service_code_set_id = currentItem.value.service_code_set.id;
+        delete itemToSave.service_code_set; // Remove unnecessary field
+    }
+
     try {
         if (props.itemType === 'Code Sets') {
             if (props.actionType === 'Add') {
@@ -156,7 +162,6 @@ async function handleSave() {
                 await updateCodeSet(itemToSave);
             }
         } else if (props.itemType === 'Code Groups') {
-            itemToSave.service_code_set = currentItem.value.service_code_set.id;
             if (props.actionType === 'Add') {
                 await addCodeGroup(itemToSave);
             } else {

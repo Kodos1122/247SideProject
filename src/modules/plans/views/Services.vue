@@ -69,11 +69,12 @@ import CodeGroups from '../../plans/components/services/Codegroups.vue';
 import Dialog from '../components/services/dialogs/Dialog.vue';
 import {
     addCodeSet,
-    fetchCodeSetsForCodeGroups,
-    addCodeGroup
+    addCodeGroup,
+    fetchCodeSetsForCodeGroups
 } from '../../../stores/localStorageData';
 import { useMainStore } from '../../../stores/useStore';
 
+// Reusable states
 const mainStore = useMainStore();
 const currentSubTab = ref('Code Sets');
 const dialogVisible = ref(false);
@@ -81,17 +82,17 @@ const dialogAction = ref('Add');
 const currentItem = ref({});
 const availableCodeSets = ref([]);
 
-// Set initial main tab and sub-tab
+// Initialize main tab and sub-tab
 mainStore.setMainTab('Services');
 mainStore.setSubTab(currentSubTab.value);
 
 // Watch for sub-tab changes
 watch(currentSubTab, (newTab) => {
     mainStore.setSubTab(newTab);
-    refresh(); // Reload data on tab change
+    refresh(); // Reload data when tab changes
 });
 
-// Select a sub-tab
+// Select sub-tab
 function selectSubTab(subTabName) {
     currentSubTab.value = subTabName;
 }
@@ -99,17 +100,9 @@ function selectSubTab(subTabName) {
 // Add new item logic
 async function handleAddNewData() {
     if (currentSubTab.value === 'Code Groups') {
-        await loadCodeSetsForDialog(); // Fetch Code Sets for dropdown
+        await loadCodeSets(); // Fetch Code Sets for dropdown
     }
-
-    currentItem.value = {
-        name: { en: '', fr: '' },
-        description: { en: '', fr: '' },
-        effective_date: '',
-        status: '',
-        is_locked: false,
-        service_code_set: { id: '', name: '' }
-    };
+    resetCurrentItem();
     dialogAction.value = 'Add';
     dialogVisible.value = true;
 }
@@ -117,17 +110,23 @@ async function handleAddNewData() {
 // Save logic for both Code Sets and Code Groups
 async function handleSave() {
     try {
+        const saveFn =
+            currentSubTab.value === 'Code Sets' ? addCodeSet : addCodeGroup;
+
+        await saveFn(currentItem.value);
+        refresh();
         dialogVisible.value = false;
     } catch (error) {
-        console.error('Error saving item:', error);
+        console.error(`Error saving ${currentSubTab.value}:`, error);
     }
 }
 
-async function loadCodeSetsForDialog() {
+// Load Code Sets for Code Groups dialog
+async function loadCodeSets() {
     try {
-        availableCodeSets.value = await fetchCodeSetsForCodeGroups(); // Use the new function
+        availableCodeSets.value = await fetchCodeSetsForCodeGroups();
     } catch (error) {
-        console.error('Failed to fetch Code Sets for Code Groups:', error);
+        console.error('Failed to load Code Sets:', error);
     }
 }
 
@@ -140,7 +139,19 @@ function refresh() {
     }
 }
 
-// Load initial data when component mounts
+// Reset the current item
+function resetCurrentItem() {
+    currentItem.value = {
+        name: { en: '', fr: '' },
+        description: { en: '', fr: '' },
+        effective_date: '',
+        status: '', // Default status set to 'active'
+        is_locked: false,
+        service_code_set: { id: '', name: '' }
+    };
+}
+
+// Cleanup on component unmount
 onBeforeUnmount(() => {
     refresh();
 });
