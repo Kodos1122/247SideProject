@@ -51,7 +51,21 @@
                     </div>
                     <a href="#" class="forgot-password">Forgot password?</a>
                 </div>
-                <button type="submit" class="submit-button">Continue</button>
+                <button
+                    type="submit"
+                    class="submit-button"
+                    :disabled="isLoading"
+                >
+                    <span class="spinner-container">
+                        <ProgressSpinner
+                            v-if="isLoading"
+                            style="width: 20px; height: 20px; margin-right: 8px"
+                            strokeWidth="5"
+                            animationDuration=".5s"
+                        />
+                    </span>
+                    Continue
+                </button>
             </form>
             <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
         </div>
@@ -61,6 +75,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useToast } from 'primevue/usetoast';
+import ProgressSpinner from 'primevue/progressspinner';
 import { apiLogin } from '../stores/localStorageData';
 
 const email = ref('');
@@ -68,13 +83,13 @@ const password = ref('');
 const errorMessage = ref('');
 const showPassword = ref(false);
 const toast = useToast();
+const isLoading = ref(false);
 
 function togglePasswordVisibility() {
     showPassword.value = !showPassword.value;
 }
 
 onMounted(() => {
-    // Check if the user has just logged out
     const justLoggedOut = localStorage.getItem('justLoggedOut');
     if (justLoggedOut) {
         toast.add({
@@ -83,12 +98,13 @@ onMounted(() => {
             detail: 'Logout successful.',
             life: 4000
         });
-        localStorage.removeItem('justLoggedOut'); // Clear the flag
+        localStorage.removeItem('justLoggedOut');
     }
 });
 
 async function handleLogin() {
     try {
+        isLoading.value = true;
         const response = await apiLogin(email.value, password.value);
 
         const token = response.access_token || response.token;
@@ -97,11 +113,13 @@ async function handleLogin() {
         }
 
         localStorage.setItem('authToken', token);
-        localStorage.setItem('justLoggedIn', 'true'); // Set flag for login toast
+        localStorage.setItem('justLoggedIn', 'true');
 
-        window.location.href = '/dashboard'; // Redirect to the dashboard
+        window.location.href = '/dashboard';
     } catch (error) {
         errorMessage.value = error.message;
+    } finally {
+        isLoading.value = false;
     }
 }
 </script>

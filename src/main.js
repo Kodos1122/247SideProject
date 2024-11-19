@@ -26,6 +26,8 @@ import Dropdown from 'primevue/dropdown';
 import Password from 'primevue/password';
 import Button from 'primevue/button';
 import Checkbox from 'primevue/checkbox';
+import Skeleton from 'primevue/skeleton';
+import ProgressSpinner from 'primevue/progressspinner';
 
 const app = createApp(App);
 
@@ -48,6 +50,8 @@ app.component('Dropdown', Dropdown);
 app.component('Password', Password);
 app.component('Checkbox', Checkbox);
 app.component('Button', Button);
+app.component('Skeleton', Skeleton);
+app.component('ProgressSpinner', ProgressSpinner);
 
 // Check authentication only once during initial load
 if (window.location.pathname !== '/login.html') {

@@ -9,7 +9,18 @@
             />
             <i class="pi pi-search"></i>
         </div>
+
+        <div v-if="isLoading" class="skeleton-loader">
+            <Skeleton
+                v-for="n in rows"
+                :key="n"
+                width="100%"
+                height="30px"
+                class="mb-2"
+            />
+        </div>
         <DataTable
+            v-else
             :value="filteredData"
             class="table-container text-sm divide-y divide-gray-400"
             responsiveLayout="scroll"
@@ -62,9 +73,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
+import Skeleton from 'primevue/skeleton';
 
 const props = defineProps({
     value: Array,
@@ -76,6 +88,7 @@ const props = defineProps({
 });
 
 const search = ref('');
+const isLoading = ref(true);
 
 const displayColumns = computed(() => {
     return props.columns.filter((col) => col.field !== 'status');
@@ -91,9 +104,21 @@ const filteredData = computed(() => {
     );
 });
 
+onMounted(() => {
+    setTimeout(() => {
+        isLoading.value = false;
+    }, 1000);
+});
+
 watch(props.value, () => {
     search.value = '';
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.skeleton-loader {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+</style>

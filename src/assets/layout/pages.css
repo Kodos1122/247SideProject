@@ -397,6 +397,7 @@
     border-radius: 10px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    position: relative;
 }
 
 .submit-button:hover {
@@ -420,4 +421,22 @@
     color: red;
     margin-top: 10px;
     font-size: 14px;
+}
+
+.submit-button:disabled {
+    cursor: not-allowed;
+}
+
+.spinner-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.button-spinner {
+    position: absolute;
+}
+
+.submit-button:hover:not(:disabled) {
+    background-color: #2467ba;
 }
