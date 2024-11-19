@@ -1,4 +1,5 @@
 <template>
+    <Toast />
     <div class="main-content">
         <nav class="flex items-center justify-between bg-white-900">
             <div class="text-[27px] font-medium">
@@ -116,22 +117,39 @@
 
 <script setup>
 import Button from 'primevue/button';
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useMainStore } from '../../stores/useStore';
 import { useRouter } from 'vue-router';
+import { useToast } from 'primevue/usetoast';
 
 const mainStore = useMainStore();
 const mainTab = computed(() => mainStore.mainTab);
 const router = useRouter();
+const toast = useToast();
 
 function logout() {
     localStorage.removeItem('authToken');
-    window.location.href = '/login.html';
+    localStorage.setItem('justLoggedOut', 'true'); // Set flag for logout toast
+    window.location.href = '/login.html'; // Redirect to the login page
 }
 
 function openLink() {
     window.open('https://github.com/Kodos1122/247SideProject.git', '_blank');
 }
+
+onMounted(() => {
+    // Check if the user has just logged in
+    const justLoggedIn = localStorage.getItem('justLoggedIn');
+    if (justLoggedIn) {
+        toast.add({
+            severity: 'success',
+            summary: 'Welcome!',
+            detail: 'Login successful.',
+            life: 4000
+        });
+        localStorage.removeItem('justLoggedIn'); // Clear the flag
+    }
+});
 </script>
 
 <style scoped></style>

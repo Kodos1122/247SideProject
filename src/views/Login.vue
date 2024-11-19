@@ -1,5 +1,6 @@
 <template>
     <div class="login-page">
+        <Toast />
         <div class="login-container">
             <img
                 src="../assets/images/new_logo.png"
@@ -21,15 +22,22 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="input-wrapper">
+                    <div class="input-wrapper password-wrapper">
                         <i class="pi pi-lock icon"></i>
                         <input
                             v-model="password"
-                            type="password"
+                            :type="showPassword ? 'text' : 'password'"
                             placeholder="Password"
                             required
                             class="input-field"
                         />
+                        <i
+                            :class="
+                                showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'
+                            "
+                            class="toggle-password-icon"
+                            @click="togglePasswordVisibility"
+                        ></i>
                     </div>
                 </div>
                 <div class="form-options">
@@ -51,12 +59,33 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useToast } from 'primevue/usetoast';
 import { apiLogin } from '../stores/localStorageData';
 
 const email = ref('');
 const password = ref('');
 const errorMessage = ref('');
+const showPassword = ref(false);
+const toast = useToast();
+
+function togglePasswordVisibility() {
+    showPassword.value = !showPassword.value;
+}
+
+onMounted(() => {
+    // Check if the user has just logged out
+    const justLoggedOut = localStorage.getItem('justLoggedOut');
+    if (justLoggedOut) {
+        toast.add({
+            severity: 'info',
+            summary: 'Logged Out',
+            detail: 'Logout successful.',
+            life: 4000
+        });
+        localStorage.removeItem('justLoggedOut'); // Clear the flag
+    }
+});
 
 async function handleLogin() {
     try {
@@ -68,7 +97,9 @@ async function handleLogin() {
         }
 
         localStorage.setItem('authToken', token);
-        window.location.href = '/dashboard';
+        localStorage.setItem('justLoggedIn', 'true'); // Set flag for login toast
+
+        window.location.href = '/dashboard'; // Redirect to the dashboard
     } catch (error) {
         errorMessage.value = error.message;
     }

@@ -23,6 +23,9 @@ import ConfirmationService from 'primevue/confirmationservice';
 import Toast from 'primevue/toast';
 import ToastService from 'primevue/toastservice';
 import Dropdown from 'primevue/dropdown';
+import Password from 'primevue/password';
+import Button from 'primevue/button';
+import Checkbox from 'primevue/checkbox';
 
 const app = createApp(App);
 
@@ -42,6 +45,9 @@ app.component('Calendar', Calendar);
 app.component('ConfirmDialog', ConfirmDialog);
 app.component('Toast', Toast);
 app.component('Dropdown', Dropdown);
+app.component('Password', Password);
+app.component('Checkbox', Checkbox);
+app.component('Button', Button);
 
 // Check authentication only once during initial load
 if (window.location.pathname !== '/login.html') {

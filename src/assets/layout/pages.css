@@ -415,6 +415,10 @@
     background-color: transparent;
 }
 
+.input-wrapper:hover {
+    border: 1px solid #14377d
+}
+
 .input-field::placeholder {
     color: #888888;
 }
@@ -454,6 +458,16 @@
     width: 20px;
     cursor: pointer;
     accent-color: #14377d;
+    border-color:5px solid #14377d;
+}
+
+.remember-me input:hover {
+    border: 1px solid #14377d
+}
+
+.remember-me input:focus {
+    outline: none;
+    border-color: #14377d;
 }
 
 .forgot-password {
@@ -462,7 +476,7 @@
 }
 
 .forgot-password:hover {
-    text-decoration: underline;
+    color:#c2091c;
 }
 
 .submit-button {
@@ -480,6 +494,19 @@
 
 .submit-button:hover {
     background-color: #1e56a0;
+}
+
+.toggle-password-icon {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #888888;
+    transition: color 0.3s;
+}
+
+.toggle-password-icon:hover {
+    color: #14377d;
 }
 
 .error {
