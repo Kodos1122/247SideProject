@@ -7,14 +7,17 @@
         closable
         @hide="hideDialog"
     >
-        <span class="text-gray-500 block mb-6 ml-4"
-            >Fill in the details below.</span
-        >
+        <span class="text-gray-500 block mb-6 ml-4">
+            Fill in the details below.
+        </span>
 
         <div v-if="itemType === 'Code Sets'" class="form-fields">
             <div class="form-field mb-7 p-float-label font-semibold">
                 <InputText v-model="currentItem.name.en" id="codeSetsNameEn" />
                 <label for="codeSetsNameEn">Name</label>
+                <span v-if="validationErrors['name.en']" class="error-message">
+                    {{ validationErrors['name.en'][0] }}
+                </span>
             </div>
             <div class="form-field mb-7 p-float-label font-semibold">
                 <InputText
@@ -22,6 +25,12 @@
                     id="codeSetsDescriptionEn"
                 />
                 <label for="codeSetsDescriptionEn">Description</label>
+                <span
+                    v-if="validationErrors['description.en']"
+                    class="error-message"
+                >
+                    {{ validationErrors['description.en'][0] }}
+                </span>
             </div>
             <div class="form-field mb-7 p-float-label font-semibold">
                 <Calendar
@@ -30,10 +39,25 @@
                     id="codeSetsEffectiveDate"
                 />
                 <label for="codeSetsEffectiveDate">Effective Date</label>
+                <span
+                    v-if="validationErrors['effective_date']"
+                    class="error-message"
+                >
+                    {{ validationErrors['effective_date'][0] }}
+                </span>
             </div>
             <div class="form-field mb-4 p-float-label font-semibold">
-                <InputText v-model="currentItem.status" id="codeSetsStatus" />
+                <Dropdown
+                    v-model="currentItem.status"
+                    :options="statusOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    id="codeSetsStatus"
+                />
                 <label for="codeSetsStatus">Status</label>
+                <span v-if="validationErrors['status']" class="error-message">
+                    {{ validationErrors['status'][0] }}
+                </span>
             </div>
         </div>
 
@@ -44,6 +68,9 @@
                     id="codeGroupsNameEn"
                 />
                 <label for="codeGroupsNameEn">Name</label>
+                <span v-if="validationErrors['name.en']" class="error-message">
+                    {{ validationErrors['name.en'][0] }}
+                </span>
             </div>
             <div class="form-field mb-7 p-float-label font-semibold">
                 <InputText
@@ -51,6 +78,12 @@
                     id="codeGroupsDescriptionEn"
                 />
                 <label for="codeGroupsDescriptionEn">Description</label>
+                <span
+                    v-if="validationErrors['description.en']"
+                    class="error-message"
+                >
+                    {{ validationErrors['description.en'][0] }}
+                </span>
             </div>
             <div class="form-field mb-7 p-float-label font-semibold">
                 <Dropdown
@@ -61,6 +94,12 @@
                     id="codeGroupsServiceCodeSet"
                 />
                 <label for="codeGroupsServiceCodeSet">Service Code Set</label>
+                <span
+                    v-if="validationErrors['service_code_set.id']"
+                    class="error-message"
+                >
+                    {{ validationErrors['service_code_set.id'][0] }}
+                </span>
             </div>
             <div class="form-field mb-7 p-float-label font-semibold">
                 <Calendar
@@ -69,10 +108,25 @@
                     id="codeGroupsEffectiveDate"
                 />
                 <label for="codeGroupsEffectiveDate">Effective Date</label>
+                <span
+                    v-if="validationErrors['effective_date']"
+                    class="error-message"
+                >
+                    {{ validationErrors['effective_date'][0] }}
+                </span>
             </div>
             <div class="form-field mb-4 p-float-label font-semibold">
-                <InputText v-model="currentItem.status" id="codeGroupsStatus" />
+                <Dropdown
+                    v-model="currentItem.status"
+                    :options="statusOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    id="codeGroupsStatus"
+                />
                 <label for="codeGroupsStatus">Status</label>
+                <span v-if="validationErrors['status']" class="error-message">
+                    {{ validationErrors['status'][0] }}
+                </span>
             </div>
         </div>
 
@@ -130,13 +184,25 @@ const currentItem = ref({
 });
 
 const dialogHeader = computed(() => `${props.actionType} ${props.itemType}`);
+const validationErrors = ref({});
+
+const statusOptions = [
+    { label: 'Active', value: 'active' },
+    { label: 'Inactive', value: 'inactive' }
+];
 
 function hideDialog() {
     emit('update:visible', false);
 }
 
 async function handleSave() {
-    if (!validateInputs()) return;
+    validationErrors.value = {};
+    const isValid =
+        props.itemType === 'Code Sets'
+            ? validateCodeSetsInputs()
+            : validateCodeGroupsInputs();
+
+    if (!isValid) return;
 
     const itemToSave = {
         ...currentItem.value,
@@ -144,6 +210,7 @@ async function handleSave() {
             ? formatDateToUTC(currentItem.value.effective_date)
             : ''
     };
+
     if (props.itemType === 'Code Groups') {
         itemToSave.service_code_set_id = currentItem.value.service_code_set.id;
         delete itemToSave.service_code_set;
@@ -178,38 +245,66 @@ async function handleSave() {
     }
 }
 
-function validateInputs() {
+function validateCodeSetsInputs() {
     const requiredFields = [
         'name.en',
         'description.en',
         'effective_date',
         'status'
     ];
-    const missingFields = requiredFields.filter((field) => {
+
+    requiredFields.forEach((field) => {
         const value = field
             .split('.')
             .reduce(
                 (obj, key) => (obj ? obj[key] : undefined),
                 currentItem.value
             );
-        return !value;
+
+        if (!value || (field === 'name.en' && value.length < 3)) {
+            validationErrors.value[field] = [
+                field === 'name.en'
+                    ? 'The name field must be at least 3 characters.'
+                    : 'This field is required.'
+            ];
+        }
     });
 
-    if (missingFields.length) {
-        toast.add({
-            severity: 'error',
-            summary: 'Validation Error',
-            detail: 'Please fill in all required fields.',
-            life: 3000
-        });
-        return false;
-    }
-    return true;
+    return Object.keys(validationErrors.value).length === 0;
+}
+
+function validateCodeGroupsInputs() {
+    const requiredFields = [
+        'name.en',
+        'description.en',
+        'effective_date',
+        'status',
+        'service_code_set.id'
+    ];
+
+    requiredFields.forEach((field) => {
+        const value = field
+            .split('.')
+            .reduce(
+                (obj, key) => (obj ? obj[key] : undefined),
+                currentItem.value
+            );
+
+        if (!value || (field === 'name.en' && value.length < 3)) {
+            validationErrors.value[field] = [
+                field === 'name.en'
+                    ? 'The name field must be at least 3 characters.'
+                    : 'This field is required.'
+            ];
+        }
+    });
+
+    return Object.keys(validationErrors.value).length === 0;
 }
 
 function handleSaveError(error) {
-    if (error.response && error.response.data) {
-        console.error('Validation Error:', error.response.data);
+    if (error.response && error.response.data.errors) {
+        validationErrors.value = error.response.data.errors;
     } else {
         console.error('Error saving item:', error);
     }
@@ -253,8 +348,8 @@ watch(
                 typeof newData.description === 'object'
                     ? newData.description
                     : { en: newData.description || '', fr: '' },
-            effective_date: newData.effective_date
-                ? new Date(newData.effective_date)
+            effective_date: newData.effectiveDate
+                ? adjustToLocalDate(newData.effectiveDate)
                 : '',
             status: newData.status || '',
             is_locked: newData.is_locked || false,
@@ -266,6 +361,21 @@ watch(
     },
     { immediate: true }
 );
+
+function adjustToLocalDate(dateString) {
+    const utcDate = new Date(dateString);
+    return new Date(
+        utcDate.getUTCFullYear(),
+        utcDate.getUTCMonth(),
+        utcDate.getUTCDate()
+    );
+}
 </script>
 
-<style scoped></style>
+<style scoped>
+.error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 4px;
+}
+</style>
