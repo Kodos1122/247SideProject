@@ -143,7 +143,7 @@ onMounted(() => {
     if (justLoggedIn) {
         toast.add({
             severity: 'success',
-            summary: 'Welcome!',
+            summary: 'Logged In!',
             detail: 'Login successful.',
             life: 4000
         });

@@ -92,6 +92,7 @@
                     optionLabel="name"
                     optionValue="id"
                     id="codeGroupsServiceCodeSet"
+                    :disabled="props.actionType === 'Edit'"
                 />
                 <label for="codeGroupsServiceCodeSet">Service Code Set</label>
                 <span
@@ -236,10 +237,10 @@ async function handleSave() {
                 await updateCodeGroup(itemToSave);
             }
         }
-        showSuccessMessage();
         emit('save');
         emit('data-saved');
         hideDialog();
+        showSuccessMessage();
     } catch (error) {
         handleSaveError(error);
     }
@@ -327,10 +328,13 @@ function formatDateToUTC(date) {
 }
 
 function showSuccessMessage() {
+    const action = props.actionType === 'Add' ? 'saved' : 'updated';
+    const item = props.itemType === 'Code Sets' ? 'Code Set' : 'Code Group';
+    const summary = props.actionType === 'Add' ? 'Saved' : 'Updated';
     toast.add({
         severity: 'success',
-        summary: 'Success',
-        detail: 'Your information has been saved',
+        summary: `${summary}`,
+        detail: `${item} ${action} successfully.`,
         life: 3000
     });
 }
