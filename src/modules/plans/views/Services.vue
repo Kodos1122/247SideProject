@@ -74,7 +74,6 @@ import {
 } from '../../../stores/localStorageData';
 import { useMainStore } from '../../../stores/useStore';
 
-// Reusable states
 const mainStore = useMainStore();
 const currentSubTab = ref('Code Sets');
 const dialogVisible = ref(false);
@@ -82,32 +81,27 @@ const dialogAction = ref('Add');
 const currentItem = ref({});
 const availableCodeSets = ref([]);
 
-// Initialize main tab and sub-tab
 mainStore.setMainTab('Services');
 mainStore.setSubTab(currentSubTab.value);
 
-// Watch for sub-tab changes
 watch(currentSubTab, (newTab) => {
     mainStore.setSubTab(newTab);
-    refresh(); // Reload data when tab changes
+    refresh();
 });
 
-// Select sub-tab
 function selectSubTab(subTabName) {
     currentSubTab.value = subTabName;
 }
 
-// Add new item logic
 async function handleAddNewData() {
     if (currentSubTab.value === 'Code Groups') {
-        await loadCodeSets(); // Fetch Code Sets for dropdown
+        await loadCodeSets();
     }
     resetCurrentItem();
     dialogAction.value = 'Add';
     dialogVisible.value = true;
 }
 
-// Save logic for both Code Sets and Code Groups
 async function handleSave() {
     try {
         const saveFn =
@@ -121,7 +115,6 @@ async function handleSave() {
     }
 }
 
-// Load Code Sets for Code Groups dialog
 async function loadCodeSets() {
     try {
         availableCodeSets.value = await fetchCodeSetsForCodeGroups();
@@ -130,7 +123,6 @@ async function loadCodeSets() {
     }
 }
 
-// Refresh data based on the active tab
 function refresh() {
     if (currentSubTab.value === 'Code Sets') {
         document.dispatchEvent(new CustomEvent('refreshCodeSets'));
@@ -139,19 +131,17 @@ function refresh() {
     }
 }
 
-// Reset the current item
 function resetCurrentItem() {
     currentItem.value = {
         name: { en: '', fr: '' },
         description: { en: '', fr: '' },
         effective_date: '',
-        status: '', // Default status set to 'active'
+        status: '',
         is_locked: false,
         service_code_set: { id: '', name: '' }
     };
 }
 
-// Cleanup on component unmount
 onBeforeUnmount(() => {
     refresh();
 });

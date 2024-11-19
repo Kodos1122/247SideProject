@@ -144,11 +144,9 @@ async function handleSave() {
             ? formatDateToUTC(currentItem.value.effective_date)
             : ''
     };
-
-    // Add `service_code_set_id` mapping for Code Groups
     if (props.itemType === 'Code Groups') {
         itemToSave.service_code_set_id = currentItem.value.service_code_set.id;
-        delete itemToSave.service_code_set; // Remove unnecessary field
+        delete itemToSave.service_code_set;
     }
 
     try {

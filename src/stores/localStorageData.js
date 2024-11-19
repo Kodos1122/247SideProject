@@ -1,32 +1,9 @@
 import axios from 'axios';
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL; // Load base URL
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 const loginEndpoint = `${apiBaseUrl}/api/cognito/login`;
 
-let token = ''; // Store the token globally
-
-// Function to fetch token dynamically
-async function fetchToken() {
-    try {
-        const response = await axios.post(
-            loginEndpoint,
-            {
-                email: import.meta.env.VITE_API_EMAIL, // Access email
-                password: import.meta.env.VITE_API_PASSWORD // Access password
-            },
-            {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }
-        );
-        console.log('Token fetched successfully');
-        return response.data.access_token;
-    } catch (error) {
-        console.error('Error fetching token:', error);
-        throw error;
-    }
-}
+let token = '';
 
 // Initialize Axios instance
 const api = axios.create({
@@ -35,18 +12,6 @@ const api = axios.create({
         'Content-Type': 'application/json; charset=utf-8'
     }
 });
-
-// Add a request interceptor to inject token dynamically
-api.interceptors.request.use(
-    async (config) => {
-        if (!token) {
-            token = await fetchToken(); // Fetch token if not already set
-        }
-        config.headers.Authorization = `Bearer ${token}`;
-        return config;
-    },
-    (error) => Promise.reject(error)
-);
 
 // Function to handle API errors
 function handleApiError(error, action) {
@@ -57,15 +22,49 @@ function handleApiError(error, action) {
     }
 }
 
-// Utility function to format dates
-function formatDateToUTC(date) {
-    if (!date) return '';
-    const d = new Date(date);
-    const year = d.getUTCFullYear();
-    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(d.getUTCDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+//Login Authentication
+export async function apiLogin(email, password) {
+    try {
+        const response = await axios.post(
+            loginEndpoint,
+            { email, password },
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        token = response.data.access_token || response.data.token;
+
+        if (!token) {
+            throw new Error('Authentication failed: No token provided.');
+        }
+        localStorage.setItem('authToken', token);
+
+        console.log('Login successful. Token stored:', token);
+        return response.data;
+    } catch (error) {
+        handleApiError(error, 'login');
+        throw new Error(error.response?.data?.message || 'Login failed');
+    }
 }
+
+api.interceptors.request.use(
+    (config) => {
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        } else {
+            const storedToken = localStorage.getItem('authToken');
+            if (storedToken) {
+                token = storedToken;
+                config.headers.Authorization = `Bearer ${token}`;
+            }
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
 
 // Fetch Code Sets
 export async function getCodeSets() {
@@ -90,7 +89,7 @@ export async function addCodeSet(newItem) {
     try {
         const response = await api.post('/api/v1/service-code-sets', newItem);
         console.log('Code Set added successfully:', response.data);
-        return response.data; // Only log once when successful
+        return response.data;
     } catch (error) {
         handleApiError(error, 'adding Code Set');
         throw error;
@@ -155,7 +154,7 @@ export async function addCodeGroup(newItem) {
             description: newItem.description,
             effective_date: newItem.effective_date,
             status: newItem.status,
-            service_code_set_id: newItem.service_code_set_id // Correct field name
+            service_code_set_id: newItem.service_code_set_id
         };
         const response = await api.post('/api/v1/service-code-groups', payload);
         console.log('Code Group added successfully:', response.data);
@@ -205,14 +204,24 @@ export async function deleteCodeGroup(id) {
 // Fetch Code Sets specifically for Code Groups
 export async function fetchCodeSetsForCodeGroups() {
     try {
-        const response = await api.get('/api/v1/service-code-sets?'); // Use the same endpoint
+        const response = await api.get('/api/v1/service-code-sets?');
         return response.data.data.map((item) => ({
             id: item.id,
-            name: item.name.en, // Include only necessary fields for Code Group use
+            name: item.name.en,
             description: item.description.en
         }));
     } catch (error) {
         handleApiError(error, 'fetching Code Sets for Code Groups');
         throw error;
     }
+}
+
+// Utility function to format dates
+function formatDateToUTC(date) {
+    if (!date) return '';
+    const d = new Date(date);
+    const year = d.getUTCFullYear();
+    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }

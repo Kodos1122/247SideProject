@@ -1,12 +1,7 @@
 <template>
-    <div id="app">
-        <Main />
-        <router-link to="/" />
-    </div>
+    <router-view />
 </template>
 
-<script setup>
-import Main from './views/Main.vue';
-</script>
+<script setup></script>
 
 <style scoped></style>

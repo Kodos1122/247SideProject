@@ -6,6 +6,7 @@ import router from './router';
 
 // Global CSS and PrimeVue theme
 import './assets/layout/main.css';
+import './assets/layout/pages.css';
 import '../src/modules/plans/assets/styles.css';
 import 'primevue/resources/themes/lara-light-blue/theme.css';
 import 'primevue/resources/primevue.min.css';
@@ -40,6 +41,16 @@ app.component('InputText', InputText);
 app.component('Calendar', Calendar);
 app.component('ConfirmDialog', ConfirmDialog);
 app.component('Toast', Toast);
-app.component('Dropdowm', Dropdown);
+app.component('Dropdown', Dropdown);
 
-app.mount('#app');
+// Check authentication only once during initial load
+if (window.location.pathname !== '/login.html') {
+    const isAuthenticated = localStorage.getItem('authToken');
+    if (!isAuthenticated) {
+        window.location.href = '/login.html';
+    } else {
+        app.mount('#app');
+    }
+} else {
+    app.mount('#app');
+}
