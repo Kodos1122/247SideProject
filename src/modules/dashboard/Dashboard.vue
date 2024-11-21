@@ -1,5 +1,12 @@
 <template>
     <Toast />
+    <ConfirmDialogComponent
+        ref="confirmDialog"
+        @confirm="handleLogout"
+        @cancel="cancelLogout"
+        message="Are you sure you want to log out?"
+        header="Log Out Confirmation"
+    />
     <div class="main-content">
         <nav class="flex items-center justify-between bg-white-900">
             <div class="text-[27px] font-medium">
@@ -107,7 +114,7 @@
                         raised
                         rounded
                         class="logout-button"
-                        @click="logout"
+                        @click="confirmLogout"
                     />
                 </div>
             </div>
@@ -117,20 +124,31 @@
 
 <script setup>
 import Button from 'primevue/button';
-import { computed, onMounted } from 'vue';
+import ConfirmDialogComponent from '../plans/components/services/dialogs/ConfirmDialog.vue';
+import { computed, ref, onMounted } from 'vue';
 import { useMainStore } from '../../stores/useStore';
-import { useRouter } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
+import { apiLogout, isAuthenticated } from '../../stores/localStorageData';
 
 const mainStore = useMainStore();
 const mainTab = computed(() => mainStore.mainTab);
-const router = useRouter();
 const toast = useToast();
+const confirmDialog = ref(null);
 
 function logout() {
-    localStorage.removeItem('authToken');
-    localStorage.setItem('justLoggedOut', 'true'); // Set flag for logout toast
-    window.location.href = '/login.html'; // Redirect to the login page
+    apiLogout(); // Call the logout API
+    localStorage.setItem('justLoggedOut', 'true'); // Set the logout flag
+    window.location.href = '/login.html'; // Redirect to login page
+}
+
+function confirmLogout() {
+    confirmDialog.value.openConfirmDialog();
+}
+
+function handleLogout() {
+    logout();
+    localStorage.setItem('justLoggedOut', 'true'); // Set flag for spinner on login page
+    window.location.href = '/login.html';
 }
 
 function openLink() {
@@ -138,7 +156,12 @@ function openLink() {
 }
 
 onMounted(() => {
-    // Check if the user has just logged in
+    // Redirect to login if not authenticated
+    if (!isAuthenticated()) {
+        window.location.href = '/login.html';
+    }
+
+    // Show login success message if recently logged in
     const justLoggedIn = localStorage.getItem('justLoggedIn');
     if (justLoggedIn) {
         toast.add({

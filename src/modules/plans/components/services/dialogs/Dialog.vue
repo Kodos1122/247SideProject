@@ -189,7 +189,8 @@ const validationErrors = ref({});
 
 const statusOptions = [
     { label: 'Active', value: 'active' },
-    { label: 'Inactive', value: 'inactive' }
+    { label: 'Inactive', value: 'inactive' },
+    { label: 'Draft', value: 'draft' }
 ];
 
 function hideDialog() {

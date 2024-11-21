@@ -1,7 +1,14 @@
 <template>
     <div class="login-page">
         <Toast />
-        <div class="login-container">
+        <div v-if="isPageLoading" class="spinner-container">
+            <ProgressSpinner
+                style="width: 50px; height: 50px"
+                strokeWidth="5"
+                animationDuration=".5s"
+            />
+        </div>
+        <div v-else class="login-container">
             <img
                 src="../assets/images/new_logo.png"
                 alt="GuardMe Logo"
@@ -54,14 +61,14 @@
                 <button
                     type="submit"
                     class="submit-button"
-                    :disabled="isLoading"
+                    :disabled="isButtonLoading"
                 >
                     <span class="spinner-container">
                         <ProgressSpinner
-                            v-if="isLoading"
-                            style="width: 20px; height: 20px; margin-right: 8px"
+                            v-if="isButtonLoading"
+                            style="width: 15px; height: 14px"
                             strokeWidth="5"
-                            animationDuration=".5s"
+                            animationDuration="1s"
                         />
                     </span>
                     Continue
@@ -83,28 +90,34 @@ const password = ref('');
 const errorMessage = ref('');
 const showPassword = ref(false);
 const toast = useToast();
-const isLoading = ref(false);
+const isButtonLoading = ref(false); // Spinner for "Continue" button
+const isPageLoading = ref(false); // Spinner after login before navigating to the dashboard
 
 function togglePasswordVisibility() {
     showPassword.value = !showPassword.value;
 }
 
 onMounted(() => {
+    // Check if redirected due to logout
     const justLoggedOut = localStorage.getItem('justLoggedOut');
     if (justLoggedOut) {
-        toast.add({
-            severity: 'info',
-            summary: 'Logged Out',
-            detail: 'Logout successful.',
-            life: 4000
-        });
-        localStorage.removeItem('justLoggedOut');
+        isPageLoading.value = true; // Show spinner for logout
+        setTimeout(() => {
+            isPageLoading.value = false; // Hide spinner after timeout
+            toast.add({
+                severity: 'info',
+                summary: 'Logged Out!',
+                detail: 'Logout Successful.',
+                life: 4000
+            });
+            localStorage.removeItem('justLoggedOut'); // Clear the flag
+        }, 1000); // Adjust delay for spinner animation
     }
 });
 
 async function handleLogin() {
     try {
-        isLoading.value = true;
+        isButtonLoading.value = true; // Show spinner on "Continue" button
         const response = await apiLogin(email.value, password.value);
 
         const token = response.access_token || response.token;
@@ -115,11 +128,15 @@ async function handleLogin() {
         localStorage.setItem('authToken', token);
         localStorage.setItem('justLoggedIn', 'true');
 
-        window.location.href = '/dashboard';
+        isButtonLoading.value = false;
+        isPageLoading.value = true; // Show full-page spinner
+        setTimeout(() => {
+            window.location.href = '/dashboard';
+        }, 1000); // Delay for spinner animation
     } catch (error) {
         errorMessage.value = error.message;
     } finally {
-        isLoading.value = false;
+        isButtonLoading.value = false;
     }
 }
 </script>

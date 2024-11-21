@@ -64,14 +64,26 @@
     box-shadow: 0 0 10px #14377d;
 }
 
+.skeleton-loader {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
 .action-button {
-    padding: 5px 10px;
-    margin-right: 5px;
-    border-radius: 4px;
-    font-size: 14px;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 11px;
+    border-radius: 8px;
     font-weight: bold;
     cursor: pointer;
     border: none;
+    transition: background-color 300ms ease;
+}
+
+.action-button i {
+    font-size: 0.7rem;
+    margin-right: 2px;
 }
 
 .edit-button {
@@ -80,7 +92,6 @@
 }
 
 .edit-button:hover {
-    transition: 300ms;
     background-color: #2467ba;
 }
 
@@ -90,7 +101,6 @@
 }
 
 .delete-button:hover {
-    transition: 300ms;
     background-color: #ef4444;
 }
 
@@ -374,6 +384,10 @@
 }
 .status-inactive {
     background-color: #ef4444;
+}
+
+.status-draft {
+    background-color: #676766;
 }
 
 .action-button {

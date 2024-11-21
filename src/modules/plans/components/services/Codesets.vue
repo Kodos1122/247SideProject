@@ -51,10 +51,10 @@ const columns = [
     { field: 'status', header: 'Status', sortable: true }
 ];
 
-const actions = [
-    { label: 'Edit', method: editItem, class: 'edit-button' },
-    { label: 'Delete', method: confirmDelete, class: 'delete-button' }
-];
+const actions = {
+    edit: editItem,
+    delete: confirmDelete
+};
 
 async function loadData() {
     try {

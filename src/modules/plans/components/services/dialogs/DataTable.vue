@@ -15,7 +15,7 @@
                 v-for="n in rows"
                 :key="n"
                 width="100%"
-                height="30px"
+                height="50px"
                 class="mb-2"
             />
         </div>
@@ -47,7 +47,9 @@
                                 'ACTIVE',
                             'status-inactive':
                                 slotProps.data.status?.toUpperCase() ===
-                                'INACTIVE'
+                                'INACTIVE',
+                            'status-draft':
+                                slotProps.data.status?.toUpperCase() === 'DRAFT'
                         }"
                     >
                         {{ slotProps.data.status?.toUpperCase() || 'UNKNOWN' }}
@@ -58,13 +60,16 @@
             <Column header="Actions">
                 <template #body="slotProps">
                     <button
-                        v-for="action in actions"
-                        :key="action.label"
-                        @click="action.method(slotProps.data)"
-                        class="action-button"
-                        :class="action.class"
+                        class="action-button edit-button"
+                        @click="actions.edit(slotProps.data)"
                     >
-                        {{ action.label }}
+                        <i class="pi pi-pencil"></i> Edit
+                    </button>
+                    <button
+                        class="action-button delete-button"
+                        @click="actions.delete(slotProps.data)"
+                    >
+                        <i class="pi pi-trash"></i> Delete
                     </button>
                 </template>
             </Column>
@@ -81,7 +86,7 @@ import Skeleton from 'primevue/skeleton';
 const props = defineProps({
     value: Array,
     columns: Array,
-    actions: Array,
+    actions: Object,
     rows: { type: Number, default: 5 },
     rowsPerPageOptions: { type: Array, default: () => [5, 10, 20, 50] },
     stripedRows: { type: Boolean, default: true }
@@ -107,7 +112,7 @@ const filteredData = computed(() => {
 onMounted(() => {
     setTimeout(() => {
         isLoading.value = false;
-    }, 1000);
+    }, 2000);
 });
 
 watch(props.value, () => {
@@ -115,10 +120,4 @@ watch(props.value, () => {
 });
 </script>
 
-<style scoped>
-.skeleton-loader {
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-}
-</style>
+<style scoped></style>

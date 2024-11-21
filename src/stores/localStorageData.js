@@ -2,18 +2,20 @@ import axios from 'axios';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 const loginEndpoint = `${apiBaseUrl}/api/cognito/login`;
+const refreshEndpoint = `${apiBaseUrl}/api/cognito/refresh`;
 
-let token = '';
+let accessToken = '';
+let refreshToken = '';
 
 // Initialize Axios instance
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
+    baseURL: apiBaseUrl,
     headers: {
         'Content-Type': 'application/json; charset=utf-8'
     }
 });
 
-// Function to handle API errors
+// Handle API errors
 function handleApiError(error, action) {
     if (error.response && error.response.data) {
         console.error(`Validation Error ${action}:`, error.response.data);
@@ -22,7 +24,7 @@ function handleApiError(error, action) {
     }
 }
 
-//Login Authentication
+// Login Authentication
 export async function apiLogin(email, password) {
     try {
         const response = await axios.post(
@@ -35,14 +37,21 @@ export async function apiLogin(email, password) {
             }
         );
 
-        token = response.data.access_token || response.data.token;
+        accessToken = response.data.access_token;
+        refreshToken = response.data.refresh_token;
 
-        if (!token) {
-            throw new Error('Authentication failed: No token provided.');
+        if (!accessToken || !refreshToken) {
+            throw new Error('Authentication failed: Tokens not provided.');
         }
-        localStorage.setItem('authToken', token);
 
-        console.log('Login successful. Token stored:', token);
+        localStorage.setItem('authToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem('isLoggedIn', 'true');
+
+        console.log('Login successful. Tokens stored:', {
+            accessToken,
+            refreshToken
+        });
         return response.data;
     } catch (error) {
         handleApiError(error, 'login');
@@ -50,15 +59,62 @@ export async function apiLogin(email, password) {
     }
 }
 
+// Logout
+export function apiLogout() {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('isLoggedIn');
+    accessToken = '';
+    refreshToken = '';
+    console.log('Logout successful. Tokens cleared.');
+}
+
+// Check if authenticated
+export function isAuthenticated() {
+    const token = localStorage.getItem('authToken');
+    return !!token;
+}
+
+// Refresh the access token
+async function refreshAccessToken() {
+    try {
+        const response = await axios.get(refreshEndpoint, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('refreshToken')}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const newToken = response.data.access_token || response.data.token;
+        if (!newToken) {
+            throw new Error('No token received during refresh.');
+        }
+
+        localStorage.setItem('authToken', newToken);
+        accessToken = newToken;
+
+        console.log('Access token refreshed successfully.');
+        return newToken;
+    } catch (error) {
+        console.error(
+            'Validation Error refreshing token:',
+            error.response?.data || error
+        );
+        apiLogout();
+        throw new Error('Failed to refresh access token. Please login again.');
+    }
+}
+
+// Axios request interceptor to attach access token
 api.interceptors.request.use(
     (config) => {
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+        if (accessToken) {
+            config.headers.Authorization = `Bearer ${accessToken}`;
         } else {
             const storedToken = localStorage.getItem('authToken');
             if (storedToken) {
-                token = storedToken;
-                config.headers.Authorization = `Bearer ${token}`;
+                accessToken = storedToken;
+                config.headers.Authorization = `Bearer ${accessToken}`;
             }
         }
         return config;
@@ -66,10 +122,46 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
+// Axios response interceptor to handle token expiration
+api.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+        if (
+            error.response &&
+            error.response.status === 401 &&
+            error.config &&
+            !error.config._retry
+        ) {
+            // Token expired or unauthorized
+            error.config._retry = true; // Prevent infinite retry loop
+            try {
+                const newToken = await refreshAccessToken();
+                error.config.headers.Authorization = `Bearer ${newToken}`;
+                return api.request(error.config); // Retry the original request with new token
+            } catch (refreshError) {
+                console.error('Failed to refresh access token:', refreshError);
+                apiLogout();
+                window.location.href = '/login.html'; // Redirect to login
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
+// Utility function to format dates
+function formatDateToUTC(date) {
+    if (!date) return '';
+    const d = new Date(date);
+    const year = d.getUTCFullYear();
+    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 // Fetch Code Sets
 export async function getCodeSets() {
     try {
-        const response = await api.get('/api/v1/service-code-sets?');
+        const response = await api.get('/api/v1/service-code-sets');
         return response.data.data.map((item) => ({
             id: item.id,
             name: item.name.en,
@@ -85,6 +177,7 @@ export async function getCodeSets() {
     }
 }
 
+// Add Code Set
 export async function addCodeSet(newItem) {
     try {
         const response = await api.post('/api/v1/service-code-sets', newItem);
@@ -96,7 +189,7 @@ export async function addCodeSet(newItem) {
     }
 }
 
-// Update a Code Set
+// Update Code Set
 export async function updateCodeSet(updatedItem) {
     if (!updatedItem.id) {
         throw new Error('Code Set ID is missing or undefined.');
@@ -114,7 +207,7 @@ export async function updateCodeSet(updatedItem) {
     }
 }
 
-// Delete a Code Set
+// Delete Code Set
 export async function deleteCodeSet(id) {
     try {
         await api.delete(`/api/v1/service-code-sets/${id}`);
@@ -128,7 +221,7 @@ export async function deleteCodeSet(id) {
 // Fetch Code Groups
 export async function getCodeGroups() {
     try {
-        const response = await api.get('/api/v1/service-code-groups?');
+        const response = await api.get('/api/v1/service-code-groups');
         return response.data.data.map((item) => ({
             id: item.id,
             name: item.name.en,
@@ -145,18 +238,10 @@ export async function getCodeGroups() {
     }
 }
 
-// Add a new Code Group
+// Add Code Group
 export async function addCodeGroup(newItem) {
     try {
-        console.log('Adding Code Group:', newItem);
-        const payload = {
-            name: newItem.name,
-            description: newItem.description,
-            effective_date: newItem.effective_date,
-            status: newItem.status,
-            service_code_set_id: newItem.service_code_set_id
-        };
-        const response = await api.post('/api/v1/service-code-groups', payload);
+        const response = await api.post('/api/v1/service-code-groups', newItem);
         console.log('Code Group added successfully:', response.data);
         return response.data;
     } catch (error) {
@@ -165,22 +250,15 @@ export async function addCodeGroup(newItem) {
     }
 }
 
-// Update a Code Group
+// Update Code Group
 export async function updateCodeGroup(updatedItem) {
     if (!updatedItem.id) {
         throw new Error('Code Group ID is missing or undefined.');
     }
     try {
-        const payload = {
-            name: updatedItem.name,
-            description: updatedItem.description,
-            effective_date: updatedItem.effective_date,
-            status: updatedItem.status,
-            service_code_set_id: updatedItem.service_code_set_id
-        };
         const response = await api.put(
             `/api/v1/service-code-groups/${updatedItem.id}`,
-            payload
+            updatedItem
         );
         console.log('Code Group updated successfully:', response.data);
         return response.data;
@@ -190,7 +268,7 @@ export async function updateCodeGroup(updatedItem) {
     }
 }
 
-// Delete a Code Group
+// Delete Code Group
 export async function deleteCodeGroup(id) {
     try {
         await api.delete(`/api/v1/service-code-groups/${id}`);
@@ -201,10 +279,10 @@ export async function deleteCodeGroup(id) {
     }
 }
 
-// Fetch Code Sets specifically for Code Groups
+// Fetch Code Sets for Code Groups
 export async function fetchCodeSetsForCodeGroups() {
     try {
-        const response = await api.get('/api/v1/service-code-sets?');
+        const response = await api.get('/api/v1/service-code-sets');
         return response.data.data.map((item) => ({
             id: item.id,
             name: item.name.en,
@@ -216,12 +294,4 @@ export async function fetchCodeSetsForCodeGroups() {
     }
 }
 
-// Utility function to format dates
-function formatDateToUTC(date) {
-    if (!date) return '';
-    const d = new Date(date);
-    const year = d.getUTCFullYear();
-    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(d.getUTCDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-}
+export { api };
