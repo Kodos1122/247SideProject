@@ -1,7 +1,7 @@
 <template>
     <div class="main-content">
-        <nav class="flex items-center justify-between bg-white-900">
-            <div class="text-[27px] font-medium">
+        <nav class="flex items-center justify-between bg-[#EFF3F8]">
+            <div class="text-[27px] font-medium bg-[#EFF3F8]">
                 <span>{{ mainTab }}</span>
             </div>
         </nav>
@@ -97,7 +97,7 @@ const mainTab = computed(() => mainStore.mainTab);
 
 <style scoped>
 .pricing-section-wrapper {
-    background-color: #f4f4f4;
+    background-color: #eff3f8;
 }
 .text-center {
     text-align: center;
@@ -121,6 +121,7 @@ const mainTab = computed(() => mainStore.mainTab);
     justify-content: center;
     max-width: 1200px;
     margin: 0 auto;
+    background: #eff3f8;
 }
 .pricing-card {
     background-color: #ffffff;

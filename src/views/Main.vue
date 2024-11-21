@@ -3,12 +3,12 @@
         <Leftside />
         <main
             :class="{ 'ml-0': !mainStore.leftsideOpen }"
-            class="transition-all duration-300 p-5 bg-gray-50 flex-1 ml-64"
+            class="transition-all duration-300 p-5 bg-[#EFF3F8] flex-1 ml-64"
         >
             <div class="flex items-center space-x-4 mb-4">
                 <button class="toggle-button" @click="mainStore.toggleLeftside">
                     <i
-                        class="pi pi-bars text-gray-700 bg-[#f1f1f1] border-4 border-transparent rounded-full transition-colors duration-300 ease-in-out hover:bg-[#1e3a8a] hover:border-[#bfdbfe] hover:text-white p-2"
+                        class="pi pi-bars text-gray-700 bg-[#EFF3F8] border-4 border-transparent rounded-full transition-colors duration-300 ease-in-out hover:bg-[#1e3a8a] hover:border-[#bfdbfe] hover:text-white p-2"
                     ></i>
                 </button>
                 <Breadcrumb />

@@ -1,7 +1,7 @@
 <template>
     <div class="main-content">
-        <nav class="flex items-center justify-between bg-white-900">
-            <div class="text-[27px] font-medium">
+        <nav class="flex items-center justify-between bg-[#EFF3F8]">
+            <div class="text-[27px] font-medium bg-[#EFF3F8]">
                 <span>{{ mainTab }}</span>
             </div>
         </nav>

@@ -84,7 +84,7 @@
 
 <style scoped>
 .features-container {
-    background-color: var(--surface-0);
+    background-color: #eff3f8;
     color: var(--surface-900);
     padding: 8px 24px;
     text-align: center;
