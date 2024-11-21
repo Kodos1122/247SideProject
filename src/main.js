@@ -3,7 +3,7 @@ import App from './App.vue';
 import PrimeVue from 'primevue/config';
 import { createPinia } from 'pinia';
 import router from './router';
-import { isAuthenticated } from './stores/localStorageData'; // Import the authentication check function
+import { isAuthenticated } from './stores/localStorageData';
 
 // Global CSS and PrimeVue theme
 import './assets/layout/main.css';
@@ -66,30 +66,26 @@ const showLogoAndSpinnerContainer = () => {
         container.style.zIndex = '9999';
         container.style.opacity = '0';
 
-        // Add the logo image
         const logo = document.createElement('img');
-        logo.src = '/new_favicon.png'; // Replace with your logo path
+        logo.src = '/new_favicon.png';
         logo.alt = 'App Logo';
-        logo.style.width = '350px'; // Adjust size as needed
+        logo.style.width = '350px';
         logo.style.height = 'auto';
         logo.style.display = 'block';
         logo.style.margin = 'auto';
         container.appendChild(logo);
 
-        // Add the progress spinner (hidden initially)
         const spinner = document.createElement('div');
-        spinner.className = 'spinner'; // This class can be styled using PrimeVue or any CSS framework
+        spinner.className = 'spinner';
         spinner.style.width = '50px';
         spinner.style.height = '50px';
         spinner.style.border = '5px solid rgba(0, 0, 0, 0.1)';
-        spinner.style.borderTop = '5px solid #3498db'; // Customize spinner color
+        spinner.style.borderTop = '5px solid #3498db';
         spinner.style.borderRadius = '50%';
         spinner.style.animation = 'spin 1s linear infinite';
-        spinner.style.display = 'none'; // Hide the spinner until the logo fades out
+        spinner.style.display = 'none';
         spinner.style.marginTop = '20px';
         container.appendChild(spinner);
-
-        // Attach the container to the body
         document.body.appendChild(container);
 
         // Trigger fade-in animation for the logo
@@ -100,14 +96,10 @@ const showLogoAndSpinnerContainer = () => {
 
         return new Promise((resolve) => {
             setTimeout(() => {
-                // Fade out the logo and fade in the spinner
-                logo.style.opacity = '0'; // Fade out logo
-
+                logo.style.opacity = '0';
                 setTimeout(() => {
-                    logo.style.display = 'none'; // Hide logo
-                    spinner.style.display = 'block'; // Show spinner
-
-                    // Continue showing spinner for a bit and then fade everything out
+                    logo.style.display = 'none';
+                    spinner.style.display = 'block';
                     setTimeout(() => {
                         container.style.transform =
                             'translate(-50%, -50%) scale(0)';
@@ -120,18 +112,18 @@ const showLogoAndSpinnerContainer = () => {
                                 'true'
                             );
                             resolve();
-                        }, 500); // Match fade-out transition duration
-                    }, 1500); // Spinner visible duration
-                }, 500); // Match logo fade-out duration
-            }, 1500); // Logo show duration
+                        }, 500);
+                    }, 1500);
+                }, 500);
+            }, 1500);
         });
     }
-    return Promise.resolve(); // If already initialized, resolve immediately
+    return Promise.resolve();
 };
 
 // Authentication and mounting logic
 async function initializeApp() {
-    await showLogoAndSpinnerContainer(); // Show logo and spinner on first load of the session
+    await showLogoAndSpinnerContainer();
 
     if (!isAuthenticated() && window.location.pathname !== '/login.html') {
         window.location.href = '/login.html';
@@ -142,7 +134,6 @@ async function initializeApp() {
 
 initializeApp();
 
-// Optional spinner CSS (add this to your global CSS)
 const style = document.createElement('style');
 style.innerHTML = `
     @keyframes spin {

@@ -90,34 +90,33 @@ const password = ref('');
 const errorMessage = ref('');
 const showPassword = ref(false);
 const toast = useToast();
-const isButtonLoading = ref(false); // Spinner for "Continue" button
-const isPageLoading = ref(false); // Spinner after login before navigating to the dashboard
+const isButtonLoading = ref(false);
+const isPageLoading = ref(false);
 
 function togglePasswordVisibility() {
     showPassword.value = !showPassword.value;
 }
 
 onMounted(() => {
-    // Check if redirected due to logout
     const justLoggedOut = localStorage.getItem('justLoggedOut');
     if (justLoggedOut) {
-        isPageLoading.value = true; // Show spinner for logout
+        isPageLoading.value = true;
         setTimeout(() => {
-            isPageLoading.value = false; // Hide spinner after timeout
+            isPageLoading.value = false;
             toast.add({
                 severity: 'info',
                 summary: 'Logged Out!',
                 detail: 'Logout Successful.',
                 life: 4000
             });
-            localStorage.removeItem('justLoggedOut'); // Clear the flag
-        }, 1000); // Adjust delay for spinner animation
+            localStorage.removeItem('justLoggedOut');
+        }, 1000);
     }
 });
 
 async function handleLogin() {
     try {
-        isButtonLoading.value = true; // Show spinner on "Continue" button
+        isButtonLoading.value = true;
         const response = await apiLogin(email.value, password.value);
 
         const token = response.access_token || response.token;
@@ -129,10 +128,10 @@ async function handleLogin() {
         localStorage.setItem('justLoggedIn', 'true');
 
         isButtonLoading.value = false;
-        isPageLoading.value = true; // Show full-page spinner
+        isPageLoading.value = true;
         setTimeout(() => {
             window.location.href = '/dashboard';
-        }, 1000); // Delay for spinner animation
+        }, 1000);
     } catch (error) {
         errorMessage.value = error.message;
     } finally {

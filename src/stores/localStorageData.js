@@ -132,16 +132,15 @@ api.interceptors.response.use(
             error.config &&
             !error.config._retry
         ) {
-            // Token expired or unauthorized
-            error.config._retry = true; // Prevent infinite retry loop
+            error.config._retry = true;
             try {
                 const newToken = await refreshAccessToken();
                 error.config.headers.Authorization = `Bearer ${newToken}`;
-                return api.request(error.config); // Retry the original request with new token
+                return api.request(error.config);
             } catch (refreshError) {
                 console.error('Failed to refresh access token:', refreshError);
                 apiLogout();
-                window.location.href = '/login.html'; // Redirect to login
+                window.location.href = '/login.html';
             }
         }
         return Promise.reject(error);
